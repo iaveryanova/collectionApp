@@ -1,11 +1,13 @@
 import React from 'react';
+import AppRoutes from './components/AppRoutes';
+import { BrowserRouter } from 'react-router-dom';
 
 
 function App() {
   return (
-    <div>
-      Hello world! This is a course project!
-    </div>
+    <BrowserRouter>
+     <AppRoutes />
+    </BrowserRouter>
   );
 }
 
