@@ -17,12 +17,12 @@ const AppRoutes: React.FC = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/auth" element={<AuthForm />} />
-        <Route path="/collectpage" element={<CollectionPage />} />
-        <Route path="/createcollect" element={<CreateCollectionPage />} />
+        <Route path="/collectionpage" element={<CollectionPage />} />
+        <Route path="/createcollection" element={<CreateCollectionPage />} />
         <Route path="/createitem" element={<CreateItemPage />} />
         <Route path="/manageuser" element={<ManageUserPage />} />
         <Route path="/personal" element={<PersonalPage />} />
-        <Route path="/viewcollect" element={<ViewCollectionPage />} />
+        <Route path="/viewcollection" element={<ViewCollectionPage />} />
         <Route path="/viewitem" element={<ViewItemPage />} />
     </Routes>
   )
