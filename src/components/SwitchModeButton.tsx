@@ -10,16 +10,6 @@ const SwitchModeButton: React.FC = () => {
     const theme = useTheme();
   const colorMode = React.useContext(ColorContext);
   return (
-    // <Box
-    //   sx={{
-    //     display: "flex",
-    //     minHeight: "100vh",
-    //     width: "100%",
-    //     alignItems: "center",
-    //     justifyContent: "center",
-    //   }}
-    // >
-    //   {theme.palette.mode} mode
       <IconButton
         sx={{ ml: 1 }}
         onClick={colorMode.toggleColorMode}

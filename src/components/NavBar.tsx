@@ -113,9 +113,6 @@ const NavBar: React.FC = (props: Props) => {
           {drawer}
         </Drawer>
       </Box>
-      {/* <Box component="main" sx={{ p: 3 }}>
-        <Toolbar />
-      </Box> */}
     </Box>
   );
 };
