@@ -1,0 +1,19 @@
+.register-form {
+    height: 100vh;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.register-form_form {
+    max-width: 360px ;
+}
+
+@media (max-width: 600px) {
+    .register-form {
+        width: 100vw;
+    }
+}

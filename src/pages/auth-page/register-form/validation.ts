@@ -20,3 +20,13 @@ export const passwordValidation = {
         return true;
     }
 };
+
+export const emailValidation = {
+    required: REQUIRED_FIELD,
+    validate: (value: string) => {
+        if (value.match(/\S+@\S+\.\S+/)) {
+           return true; 
+        }
+        return 'Email is invalid'
+    }
+};
