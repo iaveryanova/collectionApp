@@ -83,11 +83,11 @@ const NavBar: React.FC = (props: Props) => {
               Login
             </Button>
             <Button color="inherit" onClick={() => navigate("personal")}>
-              Personal Page
-            </Button>
-            <Button color="inherit" onClick={() => navigate("collectionpage")}>
               My collections
             </Button>
+            {/* <Button color="inherit" onClick={() => navigate("collectionpage")}>
+              Collection page
+            </Button> */}
             <Button color="inherit" onClick={() => navigate("")}>
               Logout
             </Button>
