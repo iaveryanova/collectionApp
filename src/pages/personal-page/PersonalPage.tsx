@@ -5,10 +5,19 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { GridSelectionModel } from "@mui/x-data-grid";
 import { useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 50 },
-  { field: "collection_name", headerName: "Collection name", width: 130 },
+  { field: "collection_name", headerName: "Collection name", width: 130, renderCell: (params) => {
+    
+    return (
+      <div>
+        {/* <Button onClick={navigate('/personalpage')}>{params.value}</Button> */}
+        <NavLink to={"/collectionpage"}>{params.value}</NavLink>
+      </div>
+    );
+  }},
   { field: "short_description", headerName: "Short description", width: 300 },
   { field: "subject", headerName: "Subject", width: 90 },
   {
@@ -34,7 +43,7 @@ const columns: GridColDef[] = [
     renderCell: (params) => {
       return (
         <div>
-          <Button>Edit</Button>
+          <Button variant="outlined">Edit</Button>
         </div>
       );
     },
@@ -110,6 +119,12 @@ const PersonalPage: React.FC = () => {
           checkboxSelection
           getRowHeight={() => "auto"}
           onSelectionModelChange={(itm) => setSelectedRows(itm)}
+          disableSelectionOnClick
+        //   sx={{
+        //     .MuiDataGrid-root .MuiDataGrid-cell:focus{
+        //         outline: none;
+        //       }
+        //   }}
         />
       </div>
 

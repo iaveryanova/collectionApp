@@ -15,6 +15,7 @@ import {
   passwordValidation,
   emailValidation,
 } from "./validation";
+import axios from "axios";
 
 interface IRegisterForm {
   firstName: string;
@@ -43,6 +44,7 @@ const RegisterForm: React.FC = (props) => {
       });
       return;
     } else {
+      let res = await axios.post('http://localhost:3020/api/register', data);
       console.log(data);
       alert("Congratulations, you are registered!");
       navigate("/auth");
