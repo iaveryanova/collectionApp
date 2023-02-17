@@ -14,9 +14,9 @@ export const loginValidation = {
 export const passwordValidation = {
     required: REQUIRED_FIELD,
     validate: (value: string) => {
-        if(value.length < 6) {
-            return 'The password must contain at least 6 characters.'
-        }
+        // if(value.length < 6) {
+        //     return 'The password must contain at least 6 characters.'
+        // }
         return true;
     }
 };

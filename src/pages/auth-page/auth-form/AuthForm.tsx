@@ -1,10 +1,12 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import axios from "axios";
-import React from "react";
+import React, { useContext } from "react";
 import { Controller, SubmitHandler, useForm, useFormState } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import "./auth-form.css";
 import { loginValidation, passwordValidation } from "./validation";
+import { UserContext } from "../../../App";
+import Cookies from "js-cookie";
 
 interface ISignInForm {
     login: string;
@@ -12,6 +14,11 @@ interface ISignInForm {
   }
 
 const AuthForm: React.FC = () => {
+
+  const context = useContext(UserContext);
+  const initToken = Cookies.get('token');
+  context?.setToken(initToken ? initToken : '');
+
   let navigate = useNavigate();
   const onRegistration = () => {
     navigate("/register");
@@ -29,6 +36,7 @@ const AuthForm: React.FC = () => {
       console.log(data);
       let res = await axios.post('http://localhost:3020/api/login', data);
       navigate("/personal");
+      console.log()
     }
     catch (err: any){
       console.log(err);

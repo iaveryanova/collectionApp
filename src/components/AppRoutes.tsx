@@ -1,5 +1,5 @@
-import React from 'react'
-import { Route, Routes } from 'react-router-dom'
+import React, { useContext, useState } from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import HomePage from '../pages/home-page/HomePage';
 import RegisterForm from '../pages/auth-page/register-form/RegisterForm';
 import AuthForm from '../pages/auth-page/auth-form/AuthForm';
@@ -10,9 +10,13 @@ import ManageUserPage from '../pages/manage-user-page/ManageUserPage';
 import PersonalPage from '../pages/personal-page/PersonalPage';
 import ViewCollectionPage from '../pages/view-collection-page/ViewCollectionPage';
 import ViewItemPage from '../pages/view-item-page/ViewItemPage';
+import { UserContext } from '../App';
 
 const AppRoutes: React.FC = () => {
+  const context = useContext(UserContext);
+  const [token, setToken] = useState(context?.token)
   return (
+    // context?.token ?
     <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<RegisterForm />} />
@@ -25,6 +29,19 @@ const AppRoutes: React.FC = () => {
         <Route path="/viewcollection" element={<ViewCollectionPage />} />
         <Route path="/viewitem" element={<ViewItemPage />} />
     </Routes>
+    // : 
+    // <Routes>
+    //     <Route path="/" element={<HomePage />} />
+    //     <Route path="/register" element={<RegisterForm />} />
+    //     <Route path="/auth" element={<AuthForm />} />
+    //     <Route path="/collectionpage" element={<Navigate to="/" replace/>} />
+    //     <Route path="/createcollection" element={<Navigate to="/" replace/>} />
+    //     <Route path="/createitem" element={<Navigate to="/" replace/>} />
+    //     <Route path="/manageuser" element={<Navigate to="/" replace/>} />
+    //     <Route path="/personal" element={<Navigate to="/" replace/>} />
+    //     <Route path="/viewcollection" element={<ViewCollectionPage />} />
+    //     <Route path="/viewitem" element={<ViewItemPage />} />
+    // </Routes>
   )
 }
 
