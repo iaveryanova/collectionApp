@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -15,6 +15,9 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import SwitchModeButton from "./SwitchModeButton";
+import {UserContext} from "../App";
+import Cookies from "js-cookie";
+import http from "../http";
 
 interface Props {
   /**
@@ -28,12 +31,23 @@ const drawerWidth = 240;
 const navItems = ["Home", "About", "Contact"];
 
 const NavBar: React.FC = (props: Props) => {
+
+  const context = useContext(UserContext);
+
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
   const navigate = useNavigate();
+
+  const logout = async () => {
+    const res = await http.post('logout', []);
+    const initToken = Cookies.get('token');
+    context?.setToken(initToken ? initToken : '');
+
+    navigate('/');
+  }
 
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
@@ -79,18 +93,26 @@ const NavBar: React.FC = (props: Props) => {
             MUI
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
-            <Button color="inherit" onClick={() => navigate("auth")}>
-              Login
-            </Button>
-            <Button color="inherit" onClick={() => navigate("personal")}>
-              My collections
-            </Button>
+
+            {context?.token ?
+              <>
+                <Button color="inherit" onClick={() => navigate("personal")}>
+                  My collections
+                </Button>
+                <Button color="inherit" onClick={logout}>
+                  Logout
+                </Button>
+              </>
+              :
+              <Button color="inherit" onClick={() => navigate("auth")}>
+                Login
+              </Button>
+            }
+
             {/* <Button color="inherit" onClick={() => navigate("collectionpage")}>
               Collection page
             </Button> */}
-            <Button color="inherit" onClick={() => navigate("")}>
-              Logout
-            </Button>
+
             <SwitchModeButton />
           </Box>
         </Toolbar>

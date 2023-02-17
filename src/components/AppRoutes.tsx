@@ -16,11 +16,9 @@ const AppRoutes: React.FC = () => {
   const context = useContext(UserContext);
   const [token, setToken] = useState(context?.token)
   return (
-    // context?.token ?
+    context?.token ?
     <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/register" element={<RegisterForm />} />
-        <Route path="/auth" element={<AuthForm />} />
         <Route path="/collectionpage" element={<CollectionPage />} />
         <Route path="/createcollection" element={<CreateCollectionPage />} />
         <Route path="/createitem" element={<CreateItemPage />} />
@@ -28,20 +26,19 @@ const AppRoutes: React.FC = () => {
         <Route path="/personal" element={<PersonalPage />} />
         <Route path="/viewcollection" element={<ViewCollectionPage />} />
         <Route path="/viewitem" element={<ViewItemPage />} />
+
+        <Route path="*" element={<Navigate to="/" replace/>} />
     </Routes>
-    // : 
-    // <Routes>
-    //     <Route path="/" element={<HomePage />} />
-    //     <Route path="/register" element={<RegisterForm />} />
-    //     <Route path="/auth" element={<AuthForm />} />
-    //     <Route path="/collectionpage" element={<Navigate to="/" replace/>} />
-    //     <Route path="/createcollection" element={<Navigate to="/" replace/>} />
-    //     <Route path="/createitem" element={<Navigate to="/" replace/>} />
-    //     <Route path="/manageuser" element={<Navigate to="/" replace/>} />
-    //     <Route path="/personal" element={<Navigate to="/" replace/>} />
-    //     <Route path="/viewcollection" element={<ViewCollectionPage />} />
-    //     <Route path="/viewitem" element={<ViewItemPage />} />
-    // </Routes>
+    :
+    <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/register" element={<RegisterForm />} />
+        <Route path="/auth" element={<AuthForm />} />
+        <Route path="/viewcollection" element={<ViewCollectionPage />} />
+        <Route path="/viewitem" element={<ViewItemPage />} />
+
+        <Route path="*" element={<Navigate to="/" replace/>} />
+    </Routes>
   )
 }
 

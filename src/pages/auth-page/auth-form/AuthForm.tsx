@@ -7,6 +7,7 @@ import "./auth-form.css";
 import { loginValidation, passwordValidation } from "./validation";
 import { UserContext } from "../../../App";
 import Cookies from "js-cookie";
+import http from "../../../http";
 
 interface ISignInForm {
     login: string;
@@ -16,8 +17,6 @@ interface ISignInForm {
 const AuthForm: React.FC = () => {
 
   const context = useContext(UserContext);
-  const initToken = Cookies.get('token');
-  context?.setToken(initToken ? initToken : '');
 
   let navigate = useNavigate();
   const onRegistration = () => {
@@ -34,12 +33,15 @@ const AuthForm: React.FC = () => {
   const onFormSubmit: SubmitHandler<ISignInForm> = async (data) => {
     try {
       console.log(data);
-      let res = await axios.post('http://localhost:3020/api/login', data);
+      const res = await http.post('login', data);
+
+      const initToken = Cookies.get('token');
+      context?.setToken(initToken ? initToken : '');
+      console.log(context?.token);
+
       navigate("/personal");
-      console.log()
     }
     catch (err: any){
-      console.log(err);
       if(err.response.status == 404) {
         alert('Пароль или логин введены неверно')
       }
