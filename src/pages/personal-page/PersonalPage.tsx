@@ -4,17 +4,20 @@ import { Button, Stack, Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { GridSelectionModel } from "@mui/x-data-grid";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 50 },
   { field: "collection_name", headerName: "Collection name", width: 130, renderCell: (params) => {
-    
+    const onClick = (_event: any) => {
+      const currentRow = params.row;
+      return alert(JSON.stringify(currentRow));
+      
+    }
     return (
       <div>
-        {/* <Button onClick={navigate('/personalpage')}>{params.value}</Button> */}
-        <NavLink to={"/collectionpage"}>{params.value}</NavLink>
+        <NavLink to={"/collectionpage"} onClick={onClick} style={{textDecoration: "none"}}>{params.value}</NavLink>
       </div>
     );
   }},
@@ -40,10 +43,16 @@ const columns: GridColDef[] = [
     field: "actions",
     headerName: "Actions",
     width: 100,
+    sortable: false,
     renderCell: (params) => {
+      const onClick = (_event: any) => {
+        const currentRow = params.row;
+        return alert(JSON.stringify(currentRow));
+        
+      };
       return (
         <div>
-          <Button variant="outlined">Edit</Button>
+          <Button variant="outlined" onClick={onClick}>Edit</Button>
         </div>
       );
     },

@@ -1,4 +1,5 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
+import axios from "axios";
 import React from "react";
 import { Controller, SubmitHandler, useForm, useFormState } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -26,6 +27,8 @@ const AuthForm: React.FC = () => {
   const onFormSubmit: SubmitHandler<ISignInForm> = async (data) => {
     try {
       console.log(data);
+      let res = await axios.post('http://localhost:3020/api/login', data);
+      navigate("/personal");
     }
     catch (err: any){
       console.log(err);

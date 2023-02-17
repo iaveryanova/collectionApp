@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AppRoutes from "./components/AppRoutes";
 import { BrowserRouter } from "react-router-dom";
 import NavBar from "./components/NavBar";
@@ -12,9 +12,29 @@ import {
 import { darkTheme } from "./themes/dark";
 import { lightTheme } from "./themes/light";
 import { ColorContext } from "./ColorContext";
-import SwitchModeButton from "./components/SwitchModeButton";
+import Cookies from 'js-cookie';
 
-function App() {
+
+
+
+interface UserContextType {
+  token: string;
+  setToken: (token: string) => void;
+}
+
+export const UserContext = React.createContext<UserContextType | null>(null);
+
+export const App: React.FC = () => {
+
+  const initToken = Cookies.get('token');
+  const [token, setToken] = useState(initToken ? initToken : '');
+
+  useEffect(()=>{
+    const initToken = Cookies.get('token');
+    setToken(initToken ? initToken : '');
+})
+
+
   const [mode, setMode] = React.useState<PaletteMode>("light");
   const colorMode = React.useMemo(
     () => ({
@@ -33,6 +53,7 @@ function App() {
   );
 
   return (
+    <UserContext.Provider value={ {token:token, setToken:setToken} }>
     <ColorContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline enableColorScheme />
@@ -42,6 +63,7 @@ function App() {
         </BrowserRouter>
       </ThemeProvider>
     </ColorContext.Provider>
+    </UserContext.Provider>
   );
 }
 
