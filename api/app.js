@@ -5,13 +5,15 @@ const cors = require('cors');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 
-
+const port = 3020;
 const app = express()
+
+
 app.use(cors({
   origin: true, //"http://localhost:3000",
   credentials: true,
 }));
-const port = 3020;
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -29,13 +31,17 @@ const sequelize = new Sequelize(config.database, config.user, config.password, {
   });
 
 const User = require('./models/User.js')(sequelize)
+const ThemeCollection = require('./models/ThemeCollection')(sequelize);
+const Collection = require('./models/Collection.js')(sequelize);
+
+  
+User.hasMany(Collection);
+Collection.belongsTo(User);
+
+ThemeCollection.hasOne(Collection);
+Collection.belongsTo(ThemeCollection);
 
 sequelize.sync({ alter: true})
-  
-
-// app.get('/', function (req, res) {
-//   res.status(200).send('Hello world!!!!')
-// })
 
 
 app.post('/api/register', async (req, res) => {
