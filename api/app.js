@@ -33,10 +33,15 @@ const sequelize = new Sequelize(config.database, config.user, config.password, {
 const User = require('./models/User.js')(sequelize)
 const ThemeCollection = require('./models/ThemeCollection')(sequelize);
 const Collection = require('./models/Collection.js')(sequelize);
+const CustomFieldsCollection = require('./models/CustomFieldsCollection.js')(sequelize);
 
   
 User.hasMany(Collection);
 Collection.belongsTo(User);
+
+
+Collection.hasMany(CustomFieldsCollection);
+CustomFieldsCollection.belongsTo(Collection);
 
 ThemeCollection.hasOne(Collection);
 Collection.belongsTo(ThemeCollection);

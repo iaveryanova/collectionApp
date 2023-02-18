@@ -80,7 +80,7 @@ const CreateCollectionPage: React.FC = () => {
         <Controller
           control={control}
           name="name"
-          // rules={loginValidation}
+          rules={{ required: true }}
           render={({ field }) => (
             <TextField
               label="Collection name"
@@ -98,7 +98,7 @@ const CreateCollectionPage: React.FC = () => {
         <Controller
           control={control}
           name="theme"
-          // rules={loginValidation}
+          rules={{ required: true }}
           render={({ field }) => (
             <TextField
               label="Theme"
