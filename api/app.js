@@ -35,16 +35,30 @@ const ThemeCollection = require('./models/ThemeCollection')(sequelize);
 const Collection = require('./models/Collection.js')(sequelize);
 const CustomFieldsCollection = require('./models/CustomFieldsCollection.js')(sequelize);
 
-  
+const ItemCollections = require('./models/ItemCollections')(sequelize);
+const CommentItems = require('./models/Comment')(sequelize);
+
+//User-Collection
 User.hasMany(Collection);
 Collection.belongsTo(User);
 
-
+//Collection-CustomFields
 Collection.hasMany(CustomFieldsCollection);
 CustomFieldsCollection.belongsTo(Collection);
 
+// Collection-Theme
 ThemeCollection.hasOne(Collection);
 Collection.belongsTo(ThemeCollection);
+
+//Collection-Item
+Collection.hasMany(ItemCollections);
+ItemCollections.belongsTo(Collection);
+
+//Comments - User - Item
+User.hasMany(CommentItems);
+CommentItems.belongsTo(User);
+ItemCollections.hasMany(CommentItems);
+CommentItems.belongsTo(ItemCollections);
 
 sequelize.sync({ alter: true})
 
