@@ -12,15 +12,23 @@ import {
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useNavigate } from "react-router-dom";
 
 interface ICreateCollectionForm {
   name: string;
   desc: string;
   theme: string;
+  field_text_1: string;
+  field_text_2: string;
+  field_text_3: string;
+  field_string_1: string;
+  field_string_2: string;
+  field_string_3: string;
+
 }
 
 const CreateCollectionPage: React.FC = () => {
-  const { handleSubmit, control } = useForm<ICreateCollectionForm>({
+  const { handleSubmit, control, reset } = useForm<ICreateCollectionForm>({
     mode: "onChange",
   });
   const { errors, isValid } = useFormState({
@@ -37,19 +45,27 @@ const CreateCollectionPage: React.FC = () => {
     }
   };
 
-  return (
-    <>
-      <Typography variant="h4" gutterBottom>
-        Create Collection
-      </Typography>
+  const navigate = useNavigate();
+  const onCollectionList = () => {
+    navigate("/personal");
+  };
 
+  const resetForm = () => {
+    reset();
+  };
+
+  return (
+    <div className="wrapper-create-collection-page">
       <form
         className="create-collection-form"
         onSubmit={handleSubmit(onFormSubmit)}
         style={{
-          width: "450px",
+          width: "500px",
         }}
       >
+        <Typography variant="h4" gutterBottom>
+          Create Collection
+        </Typography>
         <div
           style={{
             display: "flex",
@@ -83,6 +99,7 @@ const CreateCollectionPage: React.FC = () => {
           rules={{ required: true }}
           render={({ field }) => (
             <TextField
+            required
               label="Collection name"
               size="small"
               margin="normal"
@@ -101,39 +118,153 @@ const CreateCollectionPage: React.FC = () => {
           rules={{ required: true }}
           render={({ field }) => (
             <TextField
+            required
               label="Theme"
               size="small"
               margin="normal"
               fullWidth={true}
               onChange={(e) => field.onChange(e)}
               value={field.value || ""}
-              error={!!errors.name?.message}
-              helperText={errors.name?.message}
+              error={!!errors.theme?.message}
+              helperText={errors.theme?.message}
             />
           )}
         />
 
-        <Controller
+
+<Controller
           control={control}
           name="desc"
           rules={{ required: true }}
           render={({ field }) => (
-            <TextareaAutosize
-              aria-label="Description"
-              placeholder="Description"
-              style={{
-                width: 450,
-                height: 100,
-                padding: 10,
-                marginTop: "10px",
-              }}
+            <TextField
+            required
+            multiline
+              label="Description"
+              size="small"
+              margin="normal"
+              fullWidth={true}
               onChange={(e) => field.onChange(e)}
               value={field.value || ""}
-              // onError={!!errors.desc?.message}
-              // helperText={errors.desc?.message}
+              error={!!errors.desc?.message}
+              helperText={errors.desc?.message}
             />
           )}
         />
+
+        
+
+        <Typography variant="h6" gutterBottom>
+          Additional characteristics
+        </Typography>
+
+        <Typography
+          variant="subtitle1"
+          component="div"
+          gutterBottom={true}
+          sx={{ color: "rgb(180, 184, 193)" }}
+        >
+          Enter the name of the required fields
+        </Typography>
+
+        <Controller
+          control={control}
+          name="field_text_1"
+          render={({ field }) => (
+            <TextField
+            variant="filled"
+              label="Text field 1"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+
+<Controller
+          control={control}
+          name="field_text_2"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="Text field 2"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+
+
+<Controller
+          control={control}
+          name="field_text_3"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="Text field 3"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+
+<Controller
+          control={control}
+          name="field_string_1"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="String field 1"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+
+<Controller
+          control={control}
+          name="field_string_2"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="String field 2"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+
+<Controller
+          control={control}
+          name="field_string_3"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="String field 3"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+
+
 
         <div
           style={{
@@ -153,20 +284,25 @@ const CreateCollectionPage: React.FC = () => {
             Save
           </Button>
 
-          <Button 
-          variant="outlined" 
-          startIcon={<RestartAltIcon />}
-          disabled={!isValid}
+          <Button
+            onClick={resetForm}
+            variant="outlined"
+            startIcon={<RestartAltIcon />}
+            disabled={!isValid}
           >
             Reset
           </Button>
 
-          <Button variant="outlined" startIcon={<ArrowBackIcon />}>
+          <Button
+            onClick={onCollectionList}
+            variant="outlined"
+            startIcon={<ArrowBackIcon />}
+          >
             Back to collection list
           </Button>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 
