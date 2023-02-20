@@ -129,11 +129,6 @@ const PersonalPage: React.FC = () => {
           getRowHeight={() => "auto"}
           onSelectionModelChange={(itm) => setSelectedRows(itm)}
           disableSelectionOnClick
-        //   sx={{
-        //     .MuiDataGrid-root .MuiDataGrid-cell:focus{
-        //         outline: none;
-        //       }
-        //   }}
         />
       </div>
 
