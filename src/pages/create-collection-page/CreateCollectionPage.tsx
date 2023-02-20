@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./create-collection-page.css";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
-import { Box, TextareaAutosize, TextField, Typography } from "@mui/material";
+import { Box, MenuItem, TextField, Typography } from "@mui/material";
 import {
   Controller,
   SubmitHandler,
@@ -13,18 +13,41 @@ import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import http from "../../http";
+
+// const themes = [
+//   {value: 'Books'}, 
+//   {value: 'Coins'}, 
+//   {value: 'Pictures'}
+// ]
 
 interface ICreateCollectionForm {
   name: string;
   desc: string;
   theme: string;
-  field_text_1: string;
-  field_text_2: string;
-  field_text_3: string;
+
+  image: FileList;
+
   field_string_1: string;
   field_string_2: string;
   field_string_3: string;
 
+  field_integer_1: string;
+  field_integer_2: string;
+  field_integer_3: string;
+
+  field_text_1: string;
+  field_text_2: string;
+  field_text_3: string;
+
+  field_date_1: string;
+  field_date_2: string;
+  field_date_3: string;
+
+  field_bool_1: string;
+  field_bool_2: string;
+  field_bool_3: string;
 }
 
 const CreateCollectionPage: React.FC = () => {
@@ -35,13 +58,18 @@ const CreateCollectionPage: React.FC = () => {
     control,
   });
 
+  const [img, setImg] = useState<any>(null);
+
   const onFormSubmit: SubmitHandler<ICreateCollectionForm> = async (data) => {
     try {
       console.log(data);
+      let res = await http.post("/collection/create", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
     } catch (err: any) {
-      if (err.response.status == 404) {
-        alert("Данные введены не верно");
-      }
+      console.log(err);
     }
   };
 
@@ -50,9 +78,39 @@ const CreateCollectionPage: React.FC = () => {
     navigate("/personal");
   };
 
+  const handleCapture = (files: FileList) => {
+    if (files.length > 0) {
+      const reader = new FileReader();
+      reader.readAsDataURL(files[0]);
+      reader.onloadend = function (e) {
+        setImg(this.result);
+      };
+    }
+  };
+
   const resetForm = () => {
+    setImg(null);
     reset();
   };
+
+  useEffect(() => {
+    getThemes();
+}, []); 
+
+
+  const getThemes = async () => {
+    try {
+      const themes = await http.get("/themes");
+      console.log(themes);
+      setThemes(themes.data.themes);
+      console.log(themes.data.themes)
+
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const [themes, setThemes] = useState<any>([]);
 
   return (
     <div className="wrapper-create-collection-page">
@@ -79,16 +137,36 @@ const CreateCollectionPage: React.FC = () => {
               p: 2,
               border: "1px dashed grey",
               height: "150px",
+              width: "160px",
               display: "flex",
               alignItems: "center",
+              background: img ? "url(" + img + ") no-repeat center" : "none",
+              backgroundSize: "cover",
             }}
           >
-            Collection image
+            {img ? "" : "Collection image"}
           </Box>
           <Stack direction="row" alignItems="center" spacing={2}>
             <Button variant="outlined" component="label" size="large">
               Upload image
-              <input hidden accept="image/*" multiple type="file" />
+              <Controller
+                control={control}
+                name="image"
+                // rules={{ required: true }}
+                render={({ field }) => (
+                  <input
+                    hidden
+                    accept="image/*"
+                    type="file"
+                    onChange={(event) => {
+                      if (event.target.files) {
+                        handleCapture(event.target.files);
+                      }
+                      return field.onChange(event.target.files);
+                    }}
+                  />
+                )}
+              />
             </Button>
           </Stack>
         </div>
@@ -99,7 +177,7 @@ const CreateCollectionPage: React.FC = () => {
           rules={{ required: true }}
           render={({ field }) => (
             <TextField
-            required
+              required
               label="Collection name"
               size="small"
               margin="normal"
@@ -118,7 +196,8 @@ const CreateCollectionPage: React.FC = () => {
           rules={{ required: true }}
           render={({ field }) => (
             <TextField
-            required
+              required
+              select
               label="Theme"
               size="small"
               margin="normal"
@@ -126,20 +205,25 @@ const CreateCollectionPage: React.FC = () => {
               onChange={(e) => field.onChange(e)}
               value={field.value || ""}
               error={!!errors.theme?.message}
-              helperText={errors.theme?.message}
-            />
+              helperText={"Please select your theme" || errors.theme?.message}
+            >
+            {themes.map((option: any) => (
+            <MenuItem key={option.id} value={option.id}>
+              {option.name}
+            </MenuItem>
+          ))}
+          </TextField>
           )}
         />
 
-
-<Controller
+        <Controller
           control={control}
           name="desc"
           rules={{ required: true }}
           render={({ field }) => (
             <TextField
-            required
-            multiline
+              required
+              multiline
               label="Description"
               size="small"
               margin="normal"
@@ -151,8 +235,6 @@ const CreateCollectionPage: React.FC = () => {
             />
           )}
         />
-
-        
 
         <Typography variant="h6" gutterBottom>
           Additional characteristics
@@ -169,27 +251,11 @@ const CreateCollectionPage: React.FC = () => {
 
         <Controller
           control={control}
-          name="field_text_1"
-          render={({ field }) => (
-            <TextField
-            variant="filled"
-              label="Text field 1"
-              size="small"
-              margin="normal"
-              fullWidth={true}
-              onChange={(e) => field.onChange(e)}
-              value={field.value || ""}
-            />
-          )}
-        />
-
-<Controller
-          control={control}
-          name="field_text_2"
+          name="field_integer_1"
           render={({ field }) => (
             <TextField
               variant="filled"
-              label="Text field 2"
+              label="Integer field 1"
               size="small"
               margin="normal"
               fullWidth={true}
@@ -198,15 +264,28 @@ const CreateCollectionPage: React.FC = () => {
             />
           )}
         />
-
-
-<Controller
+        <Controller
           control={control}
-          name="field_text_3"
+          name="field_integer_2"
           render={({ field }) => (
             <TextField
               variant="filled"
-              label="Text field 3"
+              label="Integer field 2"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="field_integer_3"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="Integer field 3"
               size="small"
               margin="normal"
               fullWidth={true}
@@ -216,7 +295,9 @@ const CreateCollectionPage: React.FC = () => {
           )}
         />
 
-<Controller
+        <br />
+
+        <Controller
           control={control}
           name="field_string_1"
           render={({ field }) => (
@@ -232,7 +313,7 @@ const CreateCollectionPage: React.FC = () => {
           )}
         />
 
-<Controller
+        <Controller
           control={control}
           name="field_string_2"
           render={({ field }) => (
@@ -248,7 +329,7 @@ const CreateCollectionPage: React.FC = () => {
           )}
         />
 
-<Controller
+        <Controller
           control={control}
           name="field_string_3"
           render={({ field }) => (
@@ -264,7 +345,153 @@ const CreateCollectionPage: React.FC = () => {
           )}
         />
 
+        <br />
 
+        <Controller
+          control={control}
+          name="field_text_1"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="Text field 1"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="field_text_2"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="Text field 2"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="field_text_3"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="Text field 3"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+
+        <br />
+
+        <Controller
+          control={control}
+          name="field_date_1"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="Date field 1"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="field_date_2"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="Date field 2"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+
+        <Controller
+          control={control}
+          name="field_date_3"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="Date field 3"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+
+        <br />
+
+        <Controller
+          control={control}
+          name="field_bool_1"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="Boolean field 1"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="field_bool_2"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="Boolean field 2"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="field_bool_3"
+          render={({ field }) => (
+            <TextField
+              variant="filled"
+              label="Boolean field 3"
+              size="small"
+              margin="normal"
+              fullWidth={true}
+              onChange={(e) => field.onChange(e)}
+              value={field.value || ""}
+            />
+          )}
+        />
 
         <div
           style={{

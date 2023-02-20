@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 
 const port = 3020;
 const app = express()
@@ -16,6 +17,11 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
+
+// enable files upload
+app.use(fileUpload({
+  createParentPath: true
+}));
 
 const cookie_options = {
   maxAge: 1000 * 60 * 30, // 30 minutes
@@ -62,6 +68,35 @@ CommentItems.belongsTo(ItemCollections);
 
 sequelize.sync({ alter: true})
 
+// const my_init = () => {
+//   ThemeCollection.create({name: 'theme1'});
+//   ThemeCollection.create({name: 'theme2'});
+//   ThemeCollection.create({name: 'theme3'});
+// }
+
+// my_init();
+
+// const theme1 = ThemeCollection.create({ name: "Books" });
+// const theme2 = ThemeCollection.create({ name: "Coins" });
+// const theme3 = ThemeCollection.create({ name: "Pictures" });
+
+
+
+
+app.get('/api/themes', async (req, res) => {
+  const themes = await ThemeCollection.findAll();
+  if (themes.length > 0) {
+    res.status(200).json({ themes: themes});
+  } else {
+    res.sendStatus(404);
+  }
+  return;
+});
+
+
+
+
+
 
 app.post('/api/register', async (req, res) => {
   const {firstName, lastName, email, login, password, token} = req.body
@@ -69,6 +104,42 @@ app.post('/api/register', async (req, res) => {
   console.log(hash_password, password);
   const user = await User.create({firstName, lastName, email, login, password: hash_password, token});
   res.status(200).json({ message: 'Register successfully'});
+  return;
+});
+app.post('/api/collection/create', async (req, res) => {
+  let token = req.cookies['token'];
+  if(token){
+    const user = await User.findOne({ where: { token: token} });
+
+    if(!user){
+      res.clearCookie('token');
+      res.status(403).json({ message: 'Forbidden1' });
+      return;
+    }
+
+    console.log(req.files);
+
+    const {desc, name, theme} = req.body;
+    try{
+      const collection = await Collection.create({
+        desc,
+        name,
+        ThemeCollectionId: theme
+      });
+      res.status(200).json({ collection: collection});
+    }
+    catch (e){
+      console.log(e);
+      res.status(500).json({ error: e });
+      return;
+    }
+
+
+  }
+  else{
+    res.clearCookie('token');
+    res.status(403).json({ message: 'Forbidden2' });
+  }
   return;
 });
 
@@ -93,8 +164,6 @@ app.post('/api/login', async (req, res) => {
 
   return;
 });
-
-
 app.post('/api/logout', async (req, res) => {
   let token = req.cookies['token'];
   if(token){

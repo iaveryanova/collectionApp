@@ -15,7 +15,7 @@ import {
   passwordValidation,
   emailValidation,
 } from "./validation";
-import axios from "axios";
+import http from "../../../http";
 
 interface IRegisterForm {
   firstName: string;
@@ -44,10 +44,15 @@ const RegisterForm: React.FC = (props) => {
       });
       return;
     } else {
-      let res = await axios.post('http://localhost:3020/api/register', data);
-      console.log(data);
-      alert("Congratulations, you are registered!");
-      navigate("/auth");
+      try{
+        let res = await http.post('/register', data);
+        console.log(data);
+        alert("Congratulations, you are registered!");
+        navigate("/auth");
+      }
+      catch (e){
+        console.log(e);
+      }
     }
   };
 
