@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import { Button, Stack, Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -6,10 +6,27 @@ import AddIcon from "@mui/icons-material/Add";
 import { GridSelectionModel } from "@mui/x-data-grid";
 import { Navigate, useNavigate } from "react-router-dom";
 import { NavLink } from "react-router-dom";
+import http from "../../http";
+import Cookies from "js-cookie";
+
+
+interface ICollection
+{
+    id: number;
+    name: string;
+    desc: string;
+    image: FileList;
+}
+
+
+
+
+
+
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 50 },
-  { field: "collection_name", headerName: "Collection name", width: 130, renderCell: (params) => {
+  { field: "name", headerName: "Collection name", width: 130, renderCell: (params) => {
     const onClick = (_event: any) => {
       const currentRow = params.row;
       return alert(JSON.stringify(currentRow));
@@ -17,12 +34,19 @@ const columns: GridColDef[] = [
     }
     return (
       <div>
-        <NavLink to={"/collectionpage"} onClick={onClick} style={{textDecoration: "none"}}>{params.value}</NavLink>
+        <NavLink to={"/collection/"+ params.row.id} onClick={onClick} style={{textDecoration: "none"}}>{params.value}</NavLink>
       </div>
     );
   }},
-  { field: "short_description", headerName: "Short description", width: 300 },
-  { field: "subject", headerName: "Subject", width: 90 },
+  { field: "desc", headerName: "Short description", width: 300 },
+  { field: "ThemeCollection", headerName: "Theme", width: 90, renderCell: (params) => {
+    
+    return (
+      <div>
+{params.value.name}
+      </div>
+    );
+  } },
   {
     field: "image",
     headerName: "Image",
@@ -59,48 +83,7 @@ const columns: GridColDef[] = [
   },
 ];
 
-const rows = [
-  {
-    id: 1,
-    collection_name: "Love novels",
-    short_description: "Books that will make your heart beat faster",
-    subject: "Books",
-    image:
-      "https://about.proquest.com/globalassets/proquest/media/images/decrotive/oldbooks.jpg",
-  },
-  {
-    id: 2,
-    collection_name: "Love novels",
-    short_description: "Books that will make your heart beat faster",
-    subject: "Books",
-    image:
-      "https://about.proquest.com/globalassets/proquest/media/images/decrotive/oldbooks.jpg",
-  },
-  {
-    id: 3,
-    collection_name: "Love novels",
-    short_description: "Books that will make your heart beat faster",
-    subject: "Books",
-    image:
-      "https://about.proquest.com/globalassets/proquest/media/images/decrotive/oldbooks.jpg",
-  },
-  {
-    id: 4,
-    collection_name: "Love novels",
-    short_description: "Books that will make your heart beat faster",
-    subject: "Books",
-    image:
-      "https://about.proquest.com/globalassets/proquest/media/images/decrotive/oldbooks.jpg",
-  },
-  {
-    id: 5,
-    collection_name: "Love novels",
-    short_description: "Books that will make your heart beat faster",
-    subject: "Books",
-    image:
-      "https://about.proquest.com/globalassets/proquest/media/images/decrotive/oldbooks.jpg",
-  },
-];
+
 
 const PersonalPage: React.FC = () => {
   let navigate = useNavigate();
@@ -110,6 +93,29 @@ const PersonalPage: React.FC = () => {
 
   const [selectedRows, setSelectedRows] =
     React.useState<GridSelectionModel | null>([]);
+
+
+    const [collections, setCollections] = useState<any>([]);
+
+
+    useEffect(() => {
+        getCollections();
+    }, []);
+
+    const rows = collections;
+  
+
+    const getCollections = async () => {
+      try {
+        const collections = await http.get("/collections");
+        console.log(collections);
+        setCollections(collections.data.collections);
+        
+  
+      } catch (e) {
+        console.log(e);
+      }
+    };
 
   return (
     <>

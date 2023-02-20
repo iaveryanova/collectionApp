@@ -1,10 +1,11 @@
 import React from 'react'
 import { DataGrid, GridColDef, GridSelectionModel, GridValueGetterParams } from '@mui/x-data-grid';
 import { Button, Stack, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useEffect } from 'react';
 
 const columns: GridColDef[] = [
   { field: 'id', headerName: 'ID', width: 70 },
@@ -21,6 +22,7 @@ const columns: GridColDef[] = [
         return alert(JSON.stringify(currentRow));
         
       };
+      
       return (
         <div>
           <Button variant="outlined" onClick={onClick}>Edit</Button>
@@ -41,8 +43,8 @@ const rows = [
 ];
 
 
-const CollectionPage:React.FC = () => {
-
+const CollectionPage:React.FC = (props) => {
+console.log(props);
   let navigate = useNavigate();
   const createCollection = () => {
     navigate("/createitem");
@@ -54,6 +56,12 @@ const CollectionPage:React.FC = () => {
 
   const [selectedRows, setSelectedRows] =
     React.useState<GridSelectionModel | null>([]);
+
+  const {id} = useParams();
+
+  useEffect(() => {
+    console.log(id);
+  },[])
 
   return (
 <>

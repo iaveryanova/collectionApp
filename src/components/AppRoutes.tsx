@@ -19,7 +19,7 @@ const AppRoutes: React.FC = () => {
     context?.token ?
     <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/collectionpage" element={<CollectionPage />} />
+        <Route path="/collection/:id" element={<CollectionPage />} />
         <Route path="/createcollection" element={<CreateCollectionPage />} />
         <Route path="/createitem" element={<CreateItemPage />} />
         <Route path="/manageuser" element={<ManageUserPage />} />
