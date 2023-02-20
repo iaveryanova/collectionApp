@@ -32,13 +32,9 @@ const AuthForm: React.FC = () => {
 
   const onFormSubmit: SubmitHandler<ISignInForm> = async (data) => {
     try {
-      console.log(data);
       const res = await http.post('login', data);
-
       const initToken = Cookies.get('token');
       context?.setToken(initToken ? initToken : '');
-      console.log(context?.token);
-
       navigate("/personal");
     }
     catch (err: any){

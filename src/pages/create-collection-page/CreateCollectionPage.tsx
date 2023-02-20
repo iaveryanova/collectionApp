@@ -16,12 +16,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import http from "../../http";
 
-// const themes = [
-//   {value: 'Books'}, 
-//   {value: 'Coins'}, 
-//   {value: 'Pictures'}
-// ]
-
 interface ICreateCollectionForm {
   name: string;
   desc: string;
@@ -95,16 +89,13 @@ const CreateCollectionPage: React.FC = () => {
 
   useEffect(() => {
     getThemes();
-}, []); 
-
+  }, []);
 
   const getThemes = async () => {
     try {
       const themes = await http.get("/themes");
-      console.log(themes);
       setThemes(themes.data.themes);
-      console.log(themes.data.themes)
-
+      // console.log(themes.data.themes);
     } catch (e) {
       console.log(e);
     }
@@ -152,7 +143,6 @@ const CreateCollectionPage: React.FC = () => {
               <Controller
                 control={control}
                 name="image"
-                // rules={{ required: true }}
                 render={({ field }) => (
                   <input
                     hidden
@@ -207,12 +197,12 @@ const CreateCollectionPage: React.FC = () => {
               error={!!errors.theme?.message}
               helperText={"Please select your theme" || errors.theme?.message}
             >
-            {themes.map((option: any) => (
-            <MenuItem key={option.id} value={option.id}>
-              {option.name}
-            </MenuItem>
-          ))}
-          </TextField>
+              {themes.map((option: any) => (
+                <MenuItem key={option.id} value={option.id}>
+                  {option.name}
+                </MenuItem>
+              ))}
+            </TextField>
           )}
         />
 

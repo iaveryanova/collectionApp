@@ -120,7 +120,6 @@ app.get("/api/collections", async (req, res) => {
 app.post("/api/register", async (req, res) => {
   const { firstName, lastName, email, login, password, token } = req.body;
   let hash_password = crypto.createHash("md5").update(password).digest("hex");
-  console.log(hash_password, password);
   const user = await User.create({
     firstName,
     lastName,

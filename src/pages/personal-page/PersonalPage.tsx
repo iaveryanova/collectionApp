@@ -9,44 +9,46 @@ import { NavLink } from "react-router-dom";
 import http from "../../http";
 import Cookies from "js-cookie";
 
-
-interface ICollection
-{
-    id: number;
-    name: string;
-    desc: string;
-    image: FileList;
+interface ICollection {
+  id: number;
+  name: string;
+  desc: string;
+  image: FileList;
 }
-
-
-
-
-
-
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 50 },
-  { field: "name", headerName: "Collection name", width: 130, renderCell: (params) => {
-    const onClick = (_event: any) => {
-      const currentRow = params.row;
-      return alert(JSON.stringify(currentRow));
-      
-    }
-    return (
-      <div>
-        <NavLink to={"/collection/"+ params.row.id} onClick={onClick} style={{textDecoration: "none"}}>{params.value}</NavLink>
-      </div>
-    );
-  }},
+  {
+    field: "name",
+    headerName: "Collection name",
+    width: 130,
+    renderCell: (params) => {
+      const onClick = (_event: any) => {
+        const currentRow = params.row;
+        return alert(JSON.stringify(currentRow));
+      };
+      return (
+        <div>
+          <NavLink
+            to={"/collection/" + params.row.id}
+            onClick={onClick}
+            style={{ textDecoration: "none" }}
+          >
+            {params.value}
+          </NavLink>
+        </div>
+      );
+    },
+  },
   { field: "desc", headerName: "Short description", width: 300 },
-  { field: "ThemeCollection", headerName: "Theme", width: 90, renderCell: (params) => {
-    
-    return (
-      <div>
-{params.value.name}
-      </div>
-    );
-  } },
+  {
+    field: "ThemeCollection",
+    headerName: "Theme",
+    width: 90,
+    renderCell: (params) => {
+      return <div>{params.value.name}</div>;
+    },
+  },
   {
     field: "image",
     headerName: "Image",
@@ -72,18 +74,17 @@ const columns: GridColDef[] = [
       const onClick = (_event: any) => {
         const currentRow = params.row;
         return alert(JSON.stringify(currentRow));
-        
       };
       return (
         <div>
-          <Button variant="outlined" onClick={onClick}>Edit</Button>
+          <Button variant="outlined" onClick={onClick}>
+            Edit
+          </Button>
         </div>
       );
     },
   },
 ];
-
-
 
 const PersonalPage: React.FC = () => {
   let navigate = useNavigate();
@@ -94,28 +95,23 @@ const PersonalPage: React.FC = () => {
   const [selectedRows, setSelectedRows] =
     React.useState<GridSelectionModel | null>([]);
 
+  const [collections, setCollections] = useState<any>([]);
 
-    const [collections, setCollections] = useState<any>([]);
+  useEffect(() => {
+    getCollections();
+  }, []);
 
+  const rows = collections;
 
-    useEffect(() => {
-        getCollections();
-    }, []);
-
-    const rows = collections;
-  
-
-    const getCollections = async () => {
-      try {
-        const collections = await http.get("/collections");
-        console.log(collections);
-        setCollections(collections.data.collections);
-        
-  
-      } catch (e) {
-        console.log(e);
-      }
-    };
+  const getCollections = async () => {
+    try {
+      const collections = await http.get("/collections");
+      // console.log(collections);
+      setCollections(collections.data.collections);
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
     <>

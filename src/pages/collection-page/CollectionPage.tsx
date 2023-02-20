@@ -43,8 +43,7 @@ const rows = [
 ];
 
 
-const CollectionPage:React.FC = (props) => {
-console.log(props);
+const CollectionPage:React.FC = () => {
   let navigate = useNavigate();
   const createCollection = () => {
     navigate("/createitem");
