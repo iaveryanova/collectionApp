@@ -5,7 +5,7 @@ const cors = require("cors");
 const crypto = require("crypto");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
-
+const {uploadFile} = require("./uploader");
 const port = 3020;
 const app = express();
 
@@ -69,7 +69,7 @@ CommentItems.belongsTo(User);
 ItemCollections.hasMany(CommentItems);
 CommentItems.belongsTo(ItemCollections);
 
-sequelize.sync({ alter: true });
+// sequelize.sync({ alter: true });
 
 // const my_init = () => {
 //   ThemeCollection.create({name: 'theme1'});
@@ -142,13 +142,25 @@ app.post("/api/collection/create", async (req, res) => {
       return;
     }
 
-    console.log(req.files);
+    let file = null;
+    let url_image = null;
+
+    for (let k in req.files) {
+      file =  req.files[k];
+      break;
+    }
+
+    if(file){
+      url_image = await uploadFile(file);
+    }
 
     const { desc, name, theme } = req.body;
     try {
+      console.log(url_image);
       const collection = await Collection.create({
         desc,
         name,
+        image: url_image,
         ThemeCollectionId: theme,
       });
       res.status(200).json({ collection: collection });
