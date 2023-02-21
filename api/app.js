@@ -163,6 +163,50 @@ app.post("/api/collection/create", async (req, res) => {
         image: url_image,
         ThemeCollectionId: theme,
       });
+      console.log(req.body);
+
+      const custom_fields = [
+        "field_string_1",
+        "field_string_2",
+        "field_string_3",
+
+        "field_integer_1",
+        "field_integer_2",
+        "field_integer_3",
+
+        "field_text_1",
+        "field_text_2",
+        "field_text_3",
+
+        "field_date_1",
+        "field_date_2",
+        "field_date_3",
+
+        "field_bool_1",
+        "field_bool_2",
+        "field_bool_3"
+      ];
+
+      // перед новым сохранением удалить старые (не работает, нужно дописать)
+      // (кейс когда пользователь стирает значение и больше не хочет видеть этот филд)
+
+      // let old_fields = await CustomFieldsCollection.findAll({where: {CollectionId:collection.id}});
+      // for (let i = 0; i<old_fields.length; i++){
+      //   await old_fields[i].destroy();
+      // }
+
+      for(let i = 0; i<custom_fields.length; i++){
+        // console.log(custom_fields[i]);
+        for(let field in req.body){
+          if(field === custom_fields[i]){
+            // console.log(req.body[field]);
+            if(req.body[field].length > 0){
+              await CustomFieldsCollection.create({name:req.body[field], custom_field: custom_fields[i], CollectionId: collection.id})
+            }
+          }
+        }
+      }
+
       res.status(200).json({ collection: collection });
     } catch (e) {
       console.log(e);
