@@ -23,15 +23,10 @@ const columns: GridColDef[] = [
     headerName: "Collection name",
     width: 130,
     renderCell: (params) => {
-      // const onClick = (_event: any) => {
-      //   const currentRow = params.row;
-      //   return alert(JSON.stringify(currentRow));
-      // };
       return (
         <div>
           <NavLink
             to={"/collection/" + params.row.id}
-            // onClick={onClick}
             style={{ textDecoration: "none" }}
           >
             {params.value}
@@ -71,10 +66,6 @@ const columns: GridColDef[] = [
     width: 100,
     sortable: false,
     renderCell: (params) => {
-      // const onClick = (_event: any) => {
-      //   const currentRow = params.row;
-      //   return alert(JSON.stringify(currentRow));
-      // };
       return (
         <div>
           <NavLink
@@ -126,7 +117,7 @@ const PersonalPage: React.FC = () => {
       </Typography>
 
       <div
-        style={{ height: 400, width: "100%", marginTop: 10, marginBottom: 10 }}
+        style={{ height: "100vh", width: "100%", marginTop: 10, marginBottom: 10 }}
       >
         <DataGrid
           rows={rows}

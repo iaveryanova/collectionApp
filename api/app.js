@@ -71,9 +71,45 @@ CommentItems.belongsTo(ItemCollections);
 
 // sequelize.sync({ alter: true });
 
+// const my_init = () => {
+//   ThemeCollection.create({name: 'theme1'});
+//   ThemeCollection.create({name: 'theme2'});
+//   ThemeCollection.create({name: 'theme3'});
+// }
+
+// my_init();
+
 // const theme1 = ThemeCollection.create({ name: "Books" });
 // const theme2 = ThemeCollection.create({ name: "Coins" });
 // const theme3 = ThemeCollection.create({ name: "Pictures" });
+
+
+
+
+// ItemCollections.Collection = ItemCollections.belongsTo(Collection);
+// Collection.CustomFieldsCollection = Collection.hasMany(CustomFieldsCollection);
+
+
+// return ItemCollections.create({
+//   name: 'Book3',
+//   desc: 'Book3',
+//   Collection: {
+//     name: 'Books',
+//     desc: 'Books',
+//     CustomFieldsCollection: [{
+//       field_integer_1: "456",
+//       field_string: "string"
+      
+//     }]
+//   }
+// }, {
+//   include: [{
+//     association: ItemCollections.Collection,
+//     include: [ Collection.CustomFieldsCollection ]
+//   }]
+// });
+
+
 
 app.get("/api/themes", async (req, res) => {
   let token = req.cookies["token"];

@@ -27,6 +27,8 @@ const AppRoutes: React.FC = () => {
         <Route path="/personal" element={<PersonalPage />} />
         <Route path="/viewcollection" element={<ViewCollectionPage />} />
         <Route path="/viewitem" element={<ViewItemPage />} />
+        <Route path="//viewitem/:id" element={<ViewItemPage />} />
+
 
         <Route path="*" element={<Navigate to="/" replace/>} />
     </Routes>
