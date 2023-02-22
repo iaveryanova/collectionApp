@@ -52,7 +52,7 @@ const columns: GridColDef[] = [
       return (
         <div>
           <img
-            src={params.value}
+            src={params.value || "./assets/place_img.jpg"}
             alt=""
             style={{ width: "100px", height: "100px", borderRadius: "50%" }}
           />
@@ -109,6 +109,17 @@ const PersonalPage: React.FC = () => {
       console.log(e);
     }
   };
+  const deleteAction = async () => {
+    try {
+      const result = await http.post("/collections/delete", {id: selectedRows});
+      if(result){
+        getCollections();
+        
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   return (
     <>
@@ -135,7 +146,7 @@ const PersonalPage: React.FC = () => {
         <Button
           variant="outlined"
           startIcon={<DeleteIcon />}
-          // onClick={deleteAction}
+          onClick={deleteAction}
           disabled={!selectedRows || selectedRows.length == 0}
         >
           Delete

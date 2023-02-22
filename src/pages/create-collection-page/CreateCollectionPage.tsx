@@ -57,11 +57,8 @@ const CreateCollectionPage: React.FC = () => {
   const {id} = useParams();
 
   const getCollectionById = async (id:string) => {
-    console.log(id);
     try {
       let collection = await http.get("/collection/" + id );
-
-      console.log(collection)
       if(collection.data.collection){
         const obj_collection = collection.data.collection;
         for (let key in obj_collection){
@@ -69,13 +66,12 @@ const CreateCollectionPage: React.FC = () => {
           setValue(key, obj_collection[key]);
         }
 
-        setValue('theme', obj_collection.ThemeCollection.id);
-
         // @ts-ignore
         obj_collection.CustomFieldsCollections.forEach(field => setValue(field.custom_field, field.name))
 
 
         // setCol(collection.data.collection);
+        setValue('theme', obj_collection.ThemeCollection.id);
         setImg(collection.data.collection.image);
       }
     } catch (err: any) {
@@ -95,12 +91,13 @@ const CreateCollectionPage: React.FC = () => {
 
   const onFormSubmit: SubmitHandler<ICreateCollectionForm> = async (data) => {
     try {
-      console.log(data);
       let res = await http.post("/collection/create", data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+      console.log(res);
+      onCollectionList();
     } catch (err: any) {
       console.log(err);
     }
@@ -161,6 +158,7 @@ const CreateCollectionPage: React.FC = () => {
           render={({ field }) => (
             <input
               hidden
+              readOnly
               value={field.value || ''}
             />
           )}

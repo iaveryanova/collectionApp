@@ -37,10 +37,10 @@ const sequelize = new Sequelize(config.database, config.user, config.password, {
   dialect: "mysql",
 });
 
-const User = require("./models/User.js")(sequelize);
+const User = require("./models/User")(sequelize);
 const ThemeCollection = require("./models/ThemeCollection")(sequelize);
-const Collection = require("./models/Collection.js")(sequelize);
-const CustomFieldsCollection = require("./models/CustomFieldsCollection.js")(
+const Collection = require("./models/Collection")(sequelize);
+const CustomFieldsCollection = require("./models/CustomFieldsCollection")(
   sequelize
 );
 
@@ -109,182 +109,179 @@ CommentItems.belongsTo(ItemCollections);
 //   }]
 // });
 
-
-
-app.get("/api/themes", async (req, res) => {
-  let token = req.cookies["token"];
+const getUserByToken = async (token, res) => {
   if (token) {
-    const themes = await ThemeCollection.findAll();
-    if (themes.length > 0) {
-      res.status(200).json({ themes: themes });
+    const user = await User.findOne({where: {token: token}});
+    if (!user) {
+      res.clearCookie("token");
+      res.status(403).json({message: "not found user"});
     } else {
-      res.sendStatus(404);
+      res.cookie('token', token, cookie_options);
+
+      return user;
     }
   }
   else {
     res.clearCookie("token");
-    res.status(403).json({ message: "Forbidden" });
+    res.status(403).json({ message: "not found token" });
   }
-  return;
+}
+
+app.get("/api/themes", async (req, res) => {
+  let token = req.cookies["token"];
+  const user = await getUserByToken(token, res);
+
+  const themes = await ThemeCollection.findAll({ where: { is_deleted: false }});
+  if (themes.length > 0) {
+    res.status(200).json({ themes: themes });
+  } else {
+    res.sendStatus(404);
+  }
 });
 
 app.post("/api/collection/create", async (req, res) => {
   let token = req.cookies["token"];
-  if (token) {
-    const user = await User.findOne({ where: { token: token } });
+  const user = await getUserByToken(token, res);
 
-    if (!user) {
-      res.clearCookie("token");
-      res.status(403).json({ message: "Forbidden1" });
-      return;
+  let url_image = null;
+
+  if(req.files){
+    let file = null;
+    for (let k in req.files) {
+      file = req.files[k];
+      break;
     }
+    if(file){
+      url_image = await uploadFile(file);
+    }
+  }
+  else {
+    url_image = req.body.image;
+  }
 
+  let collection = null;
+
+  const { desc, name, theme } = req.body;
+
+  try {
     if(req.body.id){
-      console.log('edit mode');
+      collection = await Collection.findByPk(req.body.id);
+
+      if(!collection){
+        res.sendStatus(404);
+      }
+      collection.desc = desc;
+      collection.ThemeCollectionId = theme;
+      collection.name = name;
+      collection.image = url_image;
+
+      await collection.save();
     }
     else{
-      console.log('add mode');
+      collection = await Collection.create({
+        desc,
+        name,
+        image: url_image,
+        ThemeCollectionId: theme,
+        UserId: user.id
+      });
     }
 
-    let url_image = null;
+    const custom_fields = [
+      "field_string_1",
+      "field_string_2",
+      "field_string_3",
 
-    if(req.files){
-      let file = null;
-      for (let k in req.files) {
-        file = req.files[k];
-        break;
-      }
+      "field_integer_1",
+      "field_integer_2",
+      "field_integer_3",
 
-      if(file){
-        url_image = await uploadFile(file);
-      }
-    }
-    else {
-      console.log('file not found');
-      url_image = req.body.image;
-    }
+      "field_text_1",
+      "field_text_2",
+      "field_text_3",
 
-    let collection = null;
+      "field_date_1",
+      "field_date_2",
+      "field_date_3",
 
-    const { desc, name, theme } = req.body;
-    try {
-      if(req.body.id){
-        collection = await Collection.findByPk(req.body.id);
-        // {
-        collection.desc = desc;
-        collection.ThemeCollectionId = theme;
-        collection.name = name;
+      "field_bool_1",
+      "field_bool_2",
+      "field_bool_3"
+    ];
 
-        const gg =  await collection.save();
-      }
-      else{
-        collection = await Collection.create({
-          desc,
-          name,
-          image: url_image,
-          ThemeCollectionId: theme,
-        });
-      }
-
-      // console.log(req.body);
-
-      const custom_fields = [
-        "field_string_1",
-        "field_string_2",
-        "field_string_3",
-
-        "field_integer_1",
-        "field_integer_2",
-        "field_integer_3",
-
-        "field_text_1",
-        "field_text_2",
-        "field_text_3",
-
-        "field_date_1",
-        "field_date_2",
-        "field_date_3",
-
-        "field_bool_1",
-        "field_bool_2",
-        "field_bool_3"
-      ];
-
-      // перед новым сохранением удалить старые (не работает, нужно дописать)
+      // перед новым сохранением удалить старые
       // (кейс когда пользователь стирает значение и больше не хочет видеть этот филд)
 
       await CustomFieldsCollection.destroy({
         where: {CollectionId:collection.id}
       });
 
-      // let old_fields = await CustomFieldsCollection.findAll({where: {CollectionId:collection.id}});
-      // for (let i = 0; i<old_fields.length; i++){
-      // await old_fields[i].destroy();
-      // console.log('inside for');
-      // }
-
-      console.log('after destroy');
-
-      for(let i = 0; i<custom_fields.length; i++){
-        // console.log(custom_fields[i]);
-        for(let field in req.body){
-          if(field === custom_fields[i]){
-            // console.log(req.body[field]);
-            if(req.body[field].length > 0){
-              await CustomFieldsCollection.create({name:req.body[field], custom_field: custom_fields[i], CollectionId: collection.id})
-            }
+      // сохранение филдов введенных с формы
+    for(let i = 0; i<custom_fields.length; i++){
+      // console.log(custom_fields[i]);
+      for(let field in req.body){
+        if(field === custom_fields[i]){
+          // console.log(req.body[field]);
+          if(req.body[field].length > 0){
+            await CustomFieldsCollection.create({name:req.body[field], custom_field: custom_fields[i], CollectionId: collection.id})
           }
         }
       }
+    }
 
       res.status(200).json({ collection: collection });
     } catch (e) {
       console.log(e);
       res.status(500).json({ error: e });
-      return;
     }
-  } else {
-    res.clearCookie("token");
-    res.status(403).json({ message: "Forbidden2" });
-  }
-  return;
 });
 
 
 app.get("/api/collections", async (req, res) => {
   let token = req.cookies["token"];
-  if (token) {
-    const collections = await Collection.findAll({include: ThemeCollection} );
+  const user = await getUserByToken(token, res);
+
+   //for admin - remove UserId where condition
+   const collections = await Collection.findAll({include: ThemeCollection, where: { is_deleted: false, UserId: user.id }} );
     if (collections.length > 0) {
       res.status(200).json({ collections: collections });
     } else {
-      res.sendStatus(404);
+      res.status(200).json({ collections: [] });
     }
-  }
-  else {
-    res.clearCookie("token");
-    res.status(403).json({ message: "Forbidden" });
-  }
-  return;
 });
 
 
 app.get("/api/collection/:id", async (req, res) => {
   let token = req.cookies["token"];
-  if (token) {
-    const collection = await Collection.findByPk(req.params.id, { include: { all: true, nested: true }});
-    // console.log(collection);
+  const user = await getUserByToken(token, res);
+  const collection = await Collection.findByPk(req.params.id, { include: { all: true, nested: true }, where: { is_deleted: false }});
     if (collection !==  null) {
       res.status(200).json({ collection: collection });
     } else {
       res.sendStatus(404);
     }
+});
+
+
+app.post("/api/collections/delete", async(req, res) => {
+  let token = req.cookies["token"];
+  const user = await getUserByToken(token, res);
+
+  try {
+    const ids = req.body.id;
+    for (let i = 0; i < ids.length; i++) {
+      const collection = await Collection.findByPk(ids[i], {where : {
+        UserId: user.id}});
+      if (collection) {
+        collection.is_deleted = 1;
+        await collection.save();
+      }
+    }
+
+    res.status(200).json({ids: ids});
+  } catch (e) {
+    res.status(500).json({ error: e });
   }
-  else {
-    res.clearCookie("token");
-    res.status(403).json({ message: "Forbidden" });
-  }
-  return;
 });
 
 
@@ -300,7 +297,6 @@ app.post("/api/register", async (req, res) => {
     token,
   });
   res.status(200).json({ message: "Register successfully" });
-  return;
 });
 
 
@@ -333,8 +329,6 @@ app.post("/api/login", async (req, res) => {
     res.cookie("token", generate_token, cookie_options);
     res.status(200).json({ message: "Login successfully" });
   }
-
-  return;
 });
 
 
@@ -349,8 +343,6 @@ app.post("/api/logout", async (req, res) => {
     res.clearCookie("token");
     res.status(200).json({ message: "Logout" });
   }
-
-  return;
 });
 
 app.listen(port, () => {
