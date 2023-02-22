@@ -71,14 +71,6 @@ CommentItems.belongsTo(ItemCollections);
 
 // sequelize.sync({ alter: true });
 
-// const my_init = () => {
-//   ThemeCollection.create({name: 'theme1'});
-//   ThemeCollection.create({name: 'theme2'});
-//   ThemeCollection.create({name: 'theme3'});
-// }
-
-// my_init();
-
 // const theme1 = ThemeCollection.create({ name: "Books" });
 // const theme2 = ThemeCollection.create({ name: "Coins" });
 // const theme3 = ThemeCollection.create({ name: "Pictures" });
@@ -100,37 +92,6 @@ app.get("/api/themes", async (req, res) => {
   return;
 });
 
-app.get("/api/collections", async (req, res) => {
-  let token = req.cookies["token"];
-  if (token) {
-    const collections = await Collection.findAll({include: ThemeCollection} );
-    if (collections.length > 0) {
-      res.status(200).json({ collections: collections });
-    } else {
-      res.sendStatus(404);
-    }
-  }
-  else {
-    res.clearCookie("token");
-    res.status(403).json({ message: "Forbidden" });
-  }
-  return;
-});
-
-app.post("/api/register", async (req, res) => {
-  const { firstName, lastName, email, login, password, token } = req.body;
-  let hash_password = crypto.createHash("md5").update(password).digest("hex");
-  const user = await User.create({
-    firstName,
-    lastName,
-    email,
-    login,
-    password: hash_password,
-    token,
-  });
-  res.status(200).json({ message: "Register successfully" });
-  return;
-});
 app.post("/api/collection/create", async (req, res) => {
   let token = req.cookies["token"];
   if (token) {
@@ -142,28 +103,54 @@ app.post("/api/collection/create", async (req, res) => {
       return;
     }
 
-    let file = null;
+    if(req.body.id){
+      console.log('edit mode');
+    }
+    else{
+      console.log('add mode');
+    }
+
     let url_image = null;
 
-    for (let k in req.files) {
-      file =  req.files[k];
-      break;
+    if(req.files){
+      let file = null;
+      for (let k in req.files) {
+        file = req.files[k];
+        break;
+      }
+
+      if(file){
+        url_image = await uploadFile(file);
+      }
+    }
+    else {
+      console.log('file not found');
+      url_image = req.body.image;
     }
 
-    if(file){
-      url_image = await uploadFile(file);
-    }
+    let collection = null;
 
     const { desc, name, theme } = req.body;
     try {
-      console.log(url_image);
-      const collection = await Collection.create({
-        desc,
-        name,
-        image: url_image,
-        ThemeCollectionId: theme,
-      });
-      console.log(req.body);
+      if(req.body.id){
+        collection = await Collection.findByPk(req.body.id);
+        // {
+        collection.desc = desc;
+        collection.ThemeCollectionId = theme;
+        collection.name = name;
+
+        const gg =  await collection.save();
+      }
+      else{
+        collection = await Collection.create({
+          desc,
+          name,
+          image: url_image,
+          ThemeCollectionId: theme,
+        });
+      }
+
+      // console.log(req.body);
 
       const custom_fields = [
         "field_string_1",
@@ -190,10 +177,17 @@ app.post("/api/collection/create", async (req, res) => {
       // перед новым сохранением удалить старые (не работает, нужно дописать)
       // (кейс когда пользователь стирает значение и больше не хочет видеть этот филд)
 
+      await CustomFieldsCollection.destroy({
+        where: {CollectionId:collection.id}
+      });
+
       // let old_fields = await CustomFieldsCollection.findAll({where: {CollectionId:collection.id}});
       // for (let i = 0; i<old_fields.length; i++){
-      //   await old_fields[i].destroy();
+      // await old_fields[i].destroy();
+      // console.log('inside for');
       // }
+
+      console.log('after destroy');
 
       for(let i = 0; i<custom_fields.length; i++){
         // console.log(custom_fields[i]);
@@ -219,6 +213,60 @@ app.post("/api/collection/create", async (req, res) => {
   }
   return;
 });
+
+
+app.get("/api/collections", async (req, res) => {
+  let token = req.cookies["token"];
+  if (token) {
+    const collections = await Collection.findAll({include: ThemeCollection} );
+    if (collections.length > 0) {
+      res.status(200).json({ collections: collections });
+    } else {
+      res.sendStatus(404);
+    }
+  }
+  else {
+    res.clearCookie("token");
+    res.status(403).json({ message: "Forbidden" });
+  }
+  return;
+});
+
+
+app.get("/api/collection/:id", async (req, res) => {
+  let token = req.cookies["token"];
+  if (token) {
+    const collection = await Collection.findByPk(req.params.id, { include: { all: true, nested: true }});
+    // console.log(collection);
+    if (collection !==  null) {
+      res.status(200).json({ collection: collection });
+    } else {
+      res.sendStatus(404);
+    }
+  }
+  else {
+    res.clearCookie("token");
+    res.status(403).json({ message: "Forbidden" });
+  }
+  return;
+});
+
+
+app.post("/api/register", async (req, res) => {
+  const { firstName, lastName, email, login, password, token } = req.body;
+  let hash_password = crypto.createHash("md5").update(password).digest("hex");
+  const user = await User.create({
+    firstName,
+    lastName,
+    email,
+    login,
+    password: hash_password,
+    token,
+  });
+  res.status(200).json({ message: "Register successfully" });
+  return;
+});
+
 
 app.post("/api/login", async (req, res) => {
   console.log(req.body);
@@ -252,6 +300,8 @@ app.post("/api/login", async (req, res) => {
 
   return;
 });
+
+
 app.post("/api/logout", async (req, res) => {
   let token = req.cookies["token"];
   if (token) {

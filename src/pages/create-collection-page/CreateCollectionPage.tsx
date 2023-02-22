@@ -12,11 +12,12 @@ import {
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useNavigate } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import axios from "axios";
 import http from "../../http";
 
 interface ICreateCollectionForm {
+  id: number,
   name: string;
   desc: string;
   theme: string;
@@ -45,12 +46,50 @@ interface ICreateCollectionForm {
 }
 
 const CreateCollectionPage: React.FC = () => {
-  const { handleSubmit, control, reset } = useForm<ICreateCollectionForm>({
+  const { handleSubmit, control, reset, setValue } = useForm<ICreateCollectionForm>({
     mode: "onChange",
   });
   const { errors, isValid } = useFormState({
     control,
   });
+
+
+  const {id} = useParams();
+
+  const getCollectionById = async (id:string) => {
+    console.log(id);
+    try {
+      let collection = await http.get("/collection/" + id );
+
+      console.log(collection)
+      if(collection.data.collection){
+        const obj_collection = collection.data.collection;
+        for (let key in obj_collection){
+          // @ts-ignore
+          setValue(key, obj_collection[key]);
+        }
+
+        setValue('theme', obj_collection.ThemeCollection.id);
+
+        // @ts-ignore
+        obj_collection.CustomFieldsCollections.forEach(field => setValue(field.custom_field, field.name))
+
+
+        // setCol(collection.data.collection);
+        setImg(collection.data.collection.image);
+      }
+    } catch (err: any) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    if(id){
+      getCollectionById(id);
+    }
+
+  },[])
+
 
   const [img, setImg] = useState<any>(null);
 
@@ -115,6 +154,19 @@ const CreateCollectionPage: React.FC = () => {
         <Typography variant="h4" gutterBottom>
           Create Collection
         </Typography>
+
+        <Controller
+          control={control}
+          name="id"
+          render={({ field }) => (
+            <input
+              hidden
+              value={field.value || ''}
+            />
+          )}
+        />
+
+
         <div
           style={{
             display: "flex",

@@ -23,15 +23,15 @@ const columns: GridColDef[] = [
     headerName: "Collection name",
     width: 130,
     renderCell: (params) => {
-      const onClick = (_event: any) => {
-        const currentRow = params.row;
-        return alert(JSON.stringify(currentRow));
-      };
+      // const onClick = (_event: any) => {
+      //   const currentRow = params.row;
+      //   return alert(JSON.stringify(currentRow));
+      // };
       return (
         <div>
           <NavLink
             to={"/collection/" + params.row.id}
-            onClick={onClick}
+            // onClick={onClick}
             style={{ textDecoration: "none" }}
           >
             {params.value}
@@ -71,15 +71,21 @@ const columns: GridColDef[] = [
     width: 100,
     sortable: false,
     renderCell: (params) => {
-      const onClick = (_event: any) => {
-        const currentRow = params.row;
-        return alert(JSON.stringify(currentRow));
-      };
+      // const onClick = (_event: any) => {
+      //   const currentRow = params.row;
+      //   return alert(JSON.stringify(currentRow));
+      // };
       return (
         <div>
-          <Button variant="outlined" onClick={onClick}>
-            Edit
-          </Button>
+          <NavLink
+            to={"/collection/" + params.row.id + "/edit"}
+            style={{ textDecoration: "none" }}
+          >
+            <Button variant="outlined">
+              Edit
+            </Button>
+          </NavLink>
+
         </div>
       );
     },

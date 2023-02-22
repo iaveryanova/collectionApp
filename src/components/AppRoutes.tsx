@@ -21,6 +21,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/collection/:id" element={<CollectionPage />} />
         <Route path="/createcollection" element={<CreateCollectionPage />} />
+        <Route path="//collection/:id/edit" element={<CreateCollectionPage />} />
         <Route path="/createitem" element={<CreateItemPage />} />
         <Route path="/manageuser" element={<ManageUserPage />} />
         <Route path="/personal" element={<PersonalPage />} />
