@@ -139,6 +139,20 @@ app.get("/api/themes", async (req, res) => {
   }
 });
 
+// app.post("/api/comment", async (req, res) => {
+//   let token = req.cookies["token"];
+//   const user = await getUserByToken(token, res);
+
+ 
+//  let comment = req.body;
+
+//   comment = await Comment.create({
+//     text: req.body.comment,
+//     UserId: user.id,
+//     ItemCollectionId: req.body.id,
+//   });
+// });
+
 app.post("/api/collection/create", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
@@ -188,25 +202,25 @@ app.post("/api/collection/create", async (req, res) => {
     }
 
     const custom_fields = [
-      "field_string_1",
-      "field_string_2",
-      "field_string_3",
+      'field_integer_1',
+      'field_integer_2',
+      'field_integer_3',
 
-      "field_integer_1",
-      "field_integer_2",
-      "field_integer_3",
+      'field_string_1',
+      'field_string_2',
+      'field_string_3',
 
-      "field_text_1",
-      "field_text_2",
-      "field_text_3",
+      'field_bool_1',
+      'field_bool_2',
+      'field_bool_3',
 
-      "field_date_1",
-      "field_date_2",
-      "field_date_3",
+      'field_text_1',
+      'field_text_2',
+      'field_text_3',
 
-      "field_bool_1",
-      "field_bool_2",
-      "field_bool_3"
+      'field_date_1',
+      'field_date_2',
+      'field_date_3',
     ];
 
       // перед новым сохранением удалить старые
@@ -251,12 +265,25 @@ app.get("/api/collections", async (req, res) => {
 });
 
 
+
+
 app.get("/api/collection/:id", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
   const collection = await Collection.findByPk(req.params.id, { include: { all: true, nested: true }, where: { is_deleted: false }});
     if (collection !==  null) {
       res.status(200).json({ collection: collection });
+    } else {
+      res.sendStatus(404);
+    }
+});
+
+app.get("/api/item/:id", async (req, res) => {
+  let token = req.cookies["token"];
+  const user = await getUserByToken(token, res);
+  const item = await ItemCollections.findByPk(req.params.id, { include: { all: true, nested: true }, where: { is_deleted: false }});
+    if (item !==  null) {
+      res.status(200).json({ item: item });
     } else {
       res.sendStatus(404);
     }

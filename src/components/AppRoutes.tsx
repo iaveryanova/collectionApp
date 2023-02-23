@@ -22,13 +22,13 @@ const AppRoutes: React.FC = () => {
         <Route path="/collection/:id" element={<CollectionPage />} />
         <Route path="/createcollection" element={<CreateCollectionPage />} />
         <Route path="/collection/:id/edit" element={<CreateCollectionPage />} />
-        <Route path="/createitem" element={<CreateItemPage />} />
+        <Route path="/collection/:id/createitem" element={<CreateItemPage />} />
         <Route path="/manageuser" element={<ManageUserPage />} />
         <Route path="/personal" element={<PersonalPage />} />
         <Route path="/viewcollection" element={<ViewCollectionPage />} />
         <Route path="/viewitem" element={<ViewItemPage />} />
-        <Route path="/viewitem/:id" element={<ViewItemPage />} />
-
+        <Route path="/item/:id" element={<ViewItemPage />} />
+        <Route path="/item:id/edit" element={<CreateItemPage />} />
 
         <Route path="*" element={<Navigate to="/" replace/>} />
     </Routes>

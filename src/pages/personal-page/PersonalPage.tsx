@@ -103,12 +103,13 @@ const PersonalPage: React.FC = () => {
   const getCollections = async () => {
     try {
       const collections = await http.get("/collections");
-      // console.log(collections);
+      console.log(collections);
       setCollections(collections.data.collections);
     } catch (e) {
       console.log(e);
     }
   };
+  
   const deleteAction = async () => {
     try {
       const result = await http.post("/collections/delete", {id: selectedRows});
@@ -128,7 +129,7 @@ const PersonalPage: React.FC = () => {
       </Typography>
 
       <div
-        style={{ height: "100vh", width: "100%", marginTop: 10, marginBottom: 10 }}
+        style={{ height: 400, width: "100%", marginTop: 10, marginBottom: 10 }}
       >
         <DataGrid
           rows={rows}

@@ -4,13 +4,11 @@ const { Sequelize, DataTypes } = require('sequelize');
   module.exports = (sequelize) => {
     const CustomFieldsCollection = sequelize.define('CustomFieldsCollection', {
 
-        // name
         name: {
             type: DataTypes.STRING,
             allowNull: false
         },
 
-        // desc
         custom_field: {
             type: DataTypes.ENUM,
             values: [
@@ -22,6 +20,10 @@ const { Sequelize, DataTypes } = require('sequelize');
                 'field_string_2',
                 'field_string_3',
 
+                'field_bool_1',
+                'field_bool_2',
+                'field_bool_3',
+
                 'field_text_1',
                 'field_text_2',
                 'field_text_3',
@@ -30,9 +32,6 @@ const { Sequelize, DataTypes } = require('sequelize');
                 'field_date_2',
                 'field_date_3',
 
-                'field_bool_1',
-                'field_bool_2',
-                'field_bool_3',
             ],
             allowNull: false,
         },

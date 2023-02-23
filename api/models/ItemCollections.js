@@ -4,17 +4,18 @@ const { Sequelize, DataTypes } = require('sequelize');
   module.exports = (sequelize) => {
     const ItemCollections = sequelize.define('ItemCollections', {
 
-        // name
+        
         name: {
             type: DataTypes.STRING,
             allowNull: false
         },
 
-        // desc
+        
         desc: {
             type: DataTypes.TEXT,
             allowNull: false
         },
+
 
         field_integer_1: {
             type: DataTypes.INTEGER,
@@ -29,6 +30,7 @@ const { Sequelize, DataTypes } = require('sequelize');
             allowNull: true
         },
 
+
         field_string_1: {
             type: DataTypes.STRING,
             allowNull: true
@@ -41,6 +43,7 @@ const { Sequelize, DataTypes } = require('sequelize');
             type: DataTypes.STRING,
             allowNull: true
         },
+
 
         field_bool_1: {
             type: DataTypes.BOOLEAN,
@@ -58,7 +61,41 @@ const { Sequelize, DataTypes } = require('sequelize');
             defaultValue: null
         },
 
-        // is_deleted
+
+        field_text_1: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+            defaultValue: null
+        },
+        field_text_2: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+            defaultValue: null
+        },
+        field_text_3: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+            defaultValue: null
+        },
+
+        
+        field_date_1: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            defaultValue: null
+        },
+        field_date_2: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            defaultValue: null
+        },
+        field_date_3: {
+            type: DataTypes.DATE,
+            allowNull: true,
+            defaultValue: null
+        },
+
+
         is_deleted: {
             type: DataTypes.BOOLEAN,
             allowNull: false,

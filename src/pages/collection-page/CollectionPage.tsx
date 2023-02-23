@@ -1,15 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { DataGrid, GridColDef, GridSelectionModel, GridValueGetterParams } from '@mui/x-data-grid';
 import { Button, Stack, Typography } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect } from 'react';
+import http from '../../http';
 
 const columns: GridColDef[] = [
   { field: 'id', headerName: 'ID', width: 70 },
-  { field: 'name', headerName: 'Item name', width: 300 },
+  { field: 'name', headerName: 'Item name', width: 300, renderCell: (params) => {
+    return (
+      <div>
+        <NavLink
+          to={"/item/" + params.row.id}
+          style={{ textDecoration: "none" }}
+        >
+          {params.value}
+        </NavLink>
+      </div>
+    );
+  }, 
+},
   { field: 'createdAt', headerName: 'Date of creation', width: 150 },
   {
     field: "actions",
@@ -17,15 +30,17 @@ const columns: GridColDef[] = [
     width: 100,
     sortable: false,
     renderCell: (params) => {
-      const onClick = (_event: any) => {
-        const currentRow = params.row;
-        return alert(JSON.stringify(currentRow));
-        
-      };
-      
       return (
         <div>
-          <Button variant="outlined" onClick={onClick}>Edit</Button>
+          <NavLink
+            to={"/item/" + params.row.id + "/edit"}
+            style={{ textDecoration: "none" }}
+          >
+            <Button variant="outlined">
+              Edit
+            </Button>
+          </NavLink>
+
         </div>
       );
     },
@@ -33,20 +48,11 @@ const columns: GridColDef[] = [
 ];
 
 
-const rows = [
-  { id: 1, name: 'Snow', createdAt: '11.11.1111'},
-  { id: 2, name: 'Snow', createdAt: '11.11.1111'},
-  { id: 3, name: 'Snow', createdAt: '11.11.1111'},
-  { id: 4, name: 'Snow', createdAt: '11.11.1111'},
-  { id: 5, name: 'Snow', createdAt: '11.11.1111'},
-
-];
-
-
 const CollectionPage:React.FC = () => {
+
   let navigate = useNavigate();
-  const createCollection = () => {
-    navigate("/createitem");
+  const createItem = () => {
+    navigate("/collection/:id/createitem");
   };
 
   const onCollectionList = () => {
@@ -59,13 +65,35 @@ const CollectionPage:React.FC = () => {
   const {id} = useParams();
 
   useEffect(() => {
-    console.log(id);
+    if (id) {
+      getItemsByCollectionID(id);
+    }
   },[])
+
+
+  const [items, setItems] = useState<any>([]);
+  const [name, setName] = useState<any>([]);
+
+  const rows = items;
+
+  const getItemsByCollectionID = async (id:string) => {
+    try {
+      let collection = await http.get("/collection/" + id );
+      if(collection.data.collection){
+        const obj_collection = collection.data.collection;
+
+        setItems(obj_collection.ItemCollections)
+        setName(obj_collection.name)
+      }
+    } catch (err: any) {
+      console.log(err);
+    }
+  };
 
   return (
 <>
-<Typography variant="h4" gutterBottom>
-        Collection Name
+    <Typography variant="h4" gutterBottom>
+        Collection name: {name}
       </Typography>
 
     <div style={{ height: 400, width: '100%' }}>
@@ -94,7 +122,7 @@ const CollectionPage:React.FC = () => {
         <Button
           variant="outlined"
           startIcon={<AddIcon />}
-          onClick={createCollection}
+          onClick={createItem}
         >
           Add Item
         </Button>
