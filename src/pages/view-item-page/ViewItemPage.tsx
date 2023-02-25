@@ -16,6 +16,7 @@ import {
 } from "react-hook-form";
 import { Button, TextField, Typography } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 
 const ViewItemPage: React.FC = () => {
   const createData = (property: string, value: string) => {
@@ -26,8 +27,9 @@ const ViewItemPage: React.FC = () => {
   const [date, setDate] = useState<any>([]);
   const [collection, setCollection] = useState<any>([]);
   const [user, setUser] = useState<any>([]);
-  const [customFields, setCustomFields] = useState<any>([]);
+  const [customFieldsProperty, setCustomFieldsProperty] = useState<any>([]);
   const [comments, setComments] = useState<any>([]);
+  const [customFieldsValue, setCustomFieldsValue] = useState<any>([]);
 
   const rows = [
     createData("Name Item:", name),
@@ -55,8 +57,58 @@ const ViewItemPage: React.FC = () => {
         setDate(obj_item.createdAt);
         setCollection(obj_item.Collection.name);
         setUser(obj_item.Collection.User.firstName);
-        setCustomFields(obj_item.Collection.CustomFieldsCollections);
+        setCustomFieldsProperty(obj_item.Collection.CustomFieldsCollections);
         setComments(obj_item.Comments);
+        setValue("id", id);
+
+        let customFields = [];
+        if (obj_item.field_bool_1 != null) {
+          customFields.push(obj_item.field_bool_1);
+        }
+        if (obj_item.field_bool_2 != null) {
+          customFields.push(obj_item.field_bool_2);
+        }
+        if (obj_item.field_bool_3 != null) {
+          customFields.push(obj_item.field_bool_3);
+        }
+        if (obj_item.field_date_1 != null) {
+          customFields.push(obj_item.field_date_1);
+        }
+        if (obj_item.field_date_2 != null) {
+          customFields.push(obj_item.field_date_2);
+        }
+        if (obj_item.field_date_3 != null) {
+          customFields.push(obj_item.field_date_3);
+        }
+        if (obj_item.field_integer_1 != null) {
+          customFields.push(obj_item.field_integer_1);
+        }
+        if (obj_item.field_integer_2 != null) {
+          customFields.push(obj_item.field_integer_2);
+        }
+        if (obj_item.field_integer_3 != null) {
+          customFields.push(obj_item.field_integer_3);
+        }
+        if (obj_item.field_string_1 != null) {
+          customFields.push(obj_item.field_string_1);
+        }
+        if (obj_item.field_string_2 != null) {
+          customFields.push(obj_item.field_string_2);
+        }
+        if (obj_item.field_string_3 != null) {
+          customFields.push(obj_item.field_string_3);
+        }
+        if (obj_item.field_text_1 != null) {
+          customFields.push(obj_item.field_text_1);
+        }
+        if (obj_item.field_text_2 != null) {
+          customFields.push(obj_item.field_text_2);
+        }
+        if (obj_item.field_text_3 != null) {
+          customFields.push(obj_item.field_text_3);
+        }
+
+        setCustomFieldsValue(customFields);
       }
     } catch (err: any) {
       console.log(err);
@@ -65,10 +117,10 @@ const ViewItemPage: React.FC = () => {
 
   interface ISendCommentForm {
     comment: string;
-    id: string
+    id: string;
   }
 
-  const { handleSubmit, control } = useForm<ISendCommentForm>({
+  const { handleSubmit, control, setValue } = useForm<ISendCommentForm>({
     mode: "onChange",
   });
   const { errors, isValid } = useFormState({
@@ -77,9 +129,8 @@ const ViewItemPage: React.FC = () => {
 
   const onFormSubmit: SubmitHandler<ISendCommentForm> = async (data) => {
     try {
-      console.log(data)
-      // let comment = await http.post('comment', data);
-      // navigate("/personal");
+      console.log(data);
+      let comment = await http.post("comment", data);
     } catch (err: any) {
       if (err.response.status == 404) {
         alert("Ошибка");
@@ -113,17 +164,57 @@ const ViewItemPage: React.FC = () => {
         </Table>
       </TableContainer>
 
-      <div>
-        Custom Fields:
-        {customFields.map((option: any) => (
-          <div key={option.id}>{option.name}</div>
-        ))}
+      <div style={{ marginTop: "20px" }}>Custom Fields</div>
+      <div style={{ display: "flex" }}>
+        <div
+          style={{ display: "flex", flexDirection: "column", width: "250px" }}
+        >
+          {" "}
+          Property
+          {customFieldsProperty.map((option: any) => (
+            <TextField
+              key={option.id}
+              id="outlined-basic"
+              variant="outlined"
+              defaultValue={option.name}
+              sx={{ width: "100%" }}
+            />
+          ))}
+        </div>
+        <div
+          style={{ display: "flex", flexDirection: "column", width: "250px" }}
+        >
+          {" "}
+          Value
+          {customFieldsValue.map((option: any) => (
+            <TextField
+              key={option}
+              id="outlined-basic"
+              variant="outlined"
+              defaultValue={option}
+              sx={{ width: "100%" }}
+            />
+          ))}
+        </div>
       </div>
 
-      <div>
-        Comments:
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: "500px",
+          marginTop: "20px",
+        }}
+      >
+        <div>Comments:</div>
         {comments.map((option: any) => (
-          <div key={option.id}>{option.text}</div>
+          <TextField
+            key={option.id}
+            id="outlined-basic"
+            variant="outlined"
+            defaultValue={option.text}
+            sx={{ width: "100%" }}
+          />
         ))}
       </div>
 
@@ -146,6 +237,7 @@ const ViewItemPage: React.FC = () => {
           // rules={loginValidation}
           render={({ field }) => (
             <TextField
+              multiline
               label="Text"
               size="small"
               fullWidth={true}
@@ -155,15 +247,11 @@ const ViewItemPage: React.FC = () => {
           )}
         />
 
-<Controller
+        <Controller
           control={control}
           name="id"
           render={({ field }) => (
-            <input
-              hidden
-              readOnly
-              value= {id}
-            />
+            <input hidden readOnly value={field.value || ""} />
           )}
         />
 
@@ -181,6 +269,20 @@ const ViewItemPage: React.FC = () => {
           Send
         </Button>
       </form>
+
+      <Button
+        endIcon={<ThumbUpIcon />}
+        type="submit"
+        variant="contained"
+        fullWidth={true}
+        disableElevation={true}
+        sx={{
+          width: 100,
+          marginTop: "20px",
+        }}
+      >
+        Like
+      </Button>
     </div>
   );
 };
