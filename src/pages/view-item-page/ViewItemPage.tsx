@@ -14,7 +14,7 @@ import {
   useForm,
   useFormState,
 } from "react-hook-form";
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, Checkbox, TextField, Typography } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 
@@ -30,6 +30,7 @@ const ViewItemPage: React.FC = () => {
   const [customFieldsProperty, setCustomFieldsProperty] = useState<any>([]);
   const [comments, setComments] = useState<any>([]);
   const [customFieldsValue, setCustomFieldsValue] = useState<any>([]);
+  const [item, setItem] = useState<any>([]);
 
   const rows = [
     createData("Name Item:", name),
@@ -53,6 +54,7 @@ const ViewItemPage: React.FC = () => {
         console.log(item.data.item);
         const obj_item = item.data.item;
 
+        setItem(obj_item);
         setName(obj_item.name);
         setDate(obj_item.createdAt);
         setCollection(obj_item.Collection.name);
@@ -61,54 +63,56 @@ const ViewItemPage: React.FC = () => {
         setComments(obj_item.Comments);
         setValue("id", id);
 
-        let customFields = [];
-        if (obj_item.field_bool_1 != null) {
-          customFields.push(obj_item.field_bool_1);
-        }
-        if (obj_item.field_bool_2 != null) {
-          customFields.push(obj_item.field_bool_2);
-        }
-        if (obj_item.field_bool_3 != null) {
-          customFields.push(obj_item.field_bool_3);
-        }
-        if (obj_item.field_date_1 != null) {
-          customFields.push(obj_item.field_date_1);
-        }
-        if (obj_item.field_date_2 != null) {
-          customFields.push(obj_item.field_date_2);
-        }
-        if (obj_item.field_date_3 != null) {
-          customFields.push(obj_item.field_date_3);
-        }
-        if (obj_item.field_integer_1 != null) {
-          customFields.push(obj_item.field_integer_1);
-        }
-        if (obj_item.field_integer_2 != null) {
-          customFields.push(obj_item.field_integer_2);
-        }
-        if (obj_item.field_integer_3 != null) {
-          customFields.push(obj_item.field_integer_3);
-        }
-        if (obj_item.field_string_1 != null) {
-          customFields.push(obj_item.field_string_1);
-        }
-        if (obj_item.field_string_2 != null) {
-          customFields.push(obj_item.field_string_2);
-        }
-        if (obj_item.field_string_3 != null) {
-          customFields.push(obj_item.field_string_3);
-        }
-        if (obj_item.field_text_1 != null) {
-          customFields.push(obj_item.field_text_1);
-        }
-        if (obj_item.field_text_2 != null) {
-          customFields.push(obj_item.field_text_2);
-        }
-        if (obj_item.field_text_3 != null) {
-          customFields.push(obj_item.field_text_3);
-        }
+        // let customFields = [];
+        // if (obj_item.field_bool_1 != null) {
+        //   customFields.push(obj_item.field_bool_1);
+        // }
+        // if (obj_item.field_bool_2 != null) {
+        //   customFields.push(obj_item.field_bool_2);
+        // }
+        // if (obj_item.field_bool_3 != null) {
+        //   customFields.push(obj_item.field_bool_3);
+        // }
+        // if (obj_item.field_date_1 != null) {
+        //   customFields.push(obj_item.field_date_1);
+        // }
+        // if (obj_item.field_date_2 != null) {
+        //   customFields.push(obj_item.field_date_2);
+        // }
+        // if (obj_item.field_date_3 != null) {
+        //   customFields.push(obj_item.field_date_3);
+        // }
+        // if (obj_item.field_integer_1 != null) {
+        //   customFields.push(obj_item.field_integer_1);
+        // }
+        // if (obj_item.field_integer_2 != null) {
+        //   customFields.push(obj_item.field_integer_2);
+        // }
+        // if (obj_item.field_integer_3 != null) {
+        //   customFields.push(obj_item.field_integer_3);
+        // }
+        // if (obj_item.field_string_1 != null) {
+        //   customFields.push(obj_item.field_string_1);
+        // }
+        // if (obj_item.field_string_2 != null) {
+        //   customFields.push(obj_item.field_string_2);
+        // }
+        // if (obj_item.field_string_3 != null) {
+        //   customFields.push(obj_item.field_string_3);
+        // }
+        // if (obj_item.field_text_1 != null) {
+        //   customFields.push(obj_item.field_text_1);
+        // }
+        // if (obj_item.field_text_2 != null) {
+        //   customFields.push(obj_item.field_text_2);
+        // }
+        // if (obj_item.field_text_3 != null) {
+        //   customFields.push(obj_item.field_text_3);
+        // }
 
-        setCustomFieldsValue(customFields);
+        // obj_item.Collection.CustomFieldsCollections
+
+        // setCustomFieldsValue(customFields);
       }
     } catch (err: any) {
       console.log(err);
@@ -130,11 +134,10 @@ const ViewItemPage: React.FC = () => {
   const onFormSubmit: SubmitHandler<ISendCommentForm> = async (data) => {
     try {
       console.log(data);
-      let comment = await http.post("comment", data);
+      let res = await http.post("comment", data);
+      console.log(res);
     } catch (err: any) {
-      if (err.response.status == 404) {
-        alert("Ошибка");
-      }
+      console.log(err);
     }
   };
 
@@ -166,37 +169,45 @@ const ViewItemPage: React.FC = () => {
 
       <div style={{ marginTop: "20px" }}>Custom Fields</div>
       <div style={{ display: "flex" }}>
-        <div
-          style={{ display: "flex", flexDirection: "column", width: "250px" }}
-        >
-          {" "}
-          Property
-          {customFieldsProperty.map((option: any) => (
-            <TextField
-              key={option.id}
-              id="outlined-basic"
-              variant="outlined"
-              defaultValue={option.name}
-              sx={{ width: "100%" }}
-            />
-          ))}
-        </div>
-        <div
-          style={{ display: "flex", flexDirection: "column", width: "250px" }}
-        >
-          {" "}
-          Value
-          {customFieldsValue.map((option: any) => (
-            <TextField
-              key={option}
-              id="outlined-basic"
-              variant="outlined"
-              defaultValue={option}
-              sx={{ width: "100%" }}
-            />
-          ))}
-        </div>
-      </div>
+
+
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+        {customFieldsProperty.map((option: any) => {
+           
+    
+          //  if(option.custom_field.includes('field_date')){
+
+          //  }
+          //  else{
+          //   if(option.custom_field.includes('field_bool')){
+          //   value = <Checkbox disabled checked />
+          //   }
+          //   else{
+          //     value = item[option.custom_field].toString();
+          //   }
+          //  }
+
+
+            return (<tr>
+              <td className="name">{option.name}</td>
+              <td className="value">{
+                option.custom_field.includes('field_date') ? new Date(item[option.custom_field]).toLocaleString() :
+                option.custom_field.includes('field_bool') ? <Checkbox disabled checked = {item[option.custom_field]} /> : item[option.custom_field]
+              }</td> 
+            </tr>);
+            
+              }
+          )}
+        </tbody>
+        </table>
 
       <div
         style={{

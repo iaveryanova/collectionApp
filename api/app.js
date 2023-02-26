@@ -69,7 +69,7 @@ Comment.belongsTo(User);
 ItemCollections.hasMany(Comment);
 Comment.belongsTo(ItemCollections);
 
-// sequelize.sync({ alter: true });
+// sequelize.sync({ force: true });
 
 // const my_init = () => {
 //   ThemeCollection.create({name: 'theme1'});
@@ -140,20 +140,22 @@ app.post("/api/comment", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
 
+  let comment = null;
+
+  const { text, id } = req.body;
   try {
-    const comment = await Comment.create({
-      is_deleted,
-      UserId: "1",
-      text: req.body.comment,
-      ItemCollectionId: req.body.id,
-    });
-    res.status(200).json({ message: "Comment added successfully" });
+      comment = await Comment.create({
+        text: req.body.comment,
+        ItemCollectionId: req.body.id,
+        // UserId: user.id
+      });
+    
+
+    res.status(200).json({ message: "Comment added successfully" , comment:comment});
   } catch (e) {
     res.status(500).json({ error: e });
   }
 });
-
-
 
 app.post("/api/collection/create", async (req, res) => {
   let token = req.cookies["token"];
@@ -276,6 +278,7 @@ app.get("/api/collection/:id", async (req, res) => {
   const collection = await Collection.findByPk(req.params.id, {
     include: { all: true, nested: true },
     where: { is_deleted: false },
+    // order: [ [ItemCollections, 'createdAt', 'ASC']],
   });
   if (collection !== null) {
     res.status(200).json({ collection: collection });
@@ -283,6 +286,12 @@ app.get("/api/collection/:id", async (req, res) => {
     res.sendStatus(404);
   }
 });
+
+//ItemColl.findAll({
+  // include: { all: true, nested: true }
+  // where: { is_deleted: false },
+  // order: [ ['createdAt', 'ASC']],
+  // limit: 3;
 
 app.get("/api/item/:id", async (req, res) => {
   let token = req.cookies["token"];
