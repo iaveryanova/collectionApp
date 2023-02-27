@@ -147,12 +147,47 @@ app.post("/api/comment", async (req, res) => {
       comment = await Comment.create({
         text: req.body.comment,
         ItemCollectionId: req.body.id,
-        // UserId: user.id
+        UserId: user.id
       });
     
 
     res.status(200).json({ message: "Comment added successfully" , comment:comment});
   } catch (e) {
+    res.status(500).json({ error: e });
+  }
+});
+
+app.post("/api/item/create", async (req, res) => {
+  let token = req.cookies["token"];
+  const user = await getUserByToken(token, res);
+console.log(req.body);
+  try {
+      let item = await ItemCollections.create({
+        name: req.body.name,
+        desc: req.body.desc,
+        field_integer_1: req.body.field_integer_1 ?? null,
+        field_integer_2: req.body.field_integer_2 ?? null,
+        field_integer_3: req.body.field_integer_3 ?? null,
+        field_string_1: req.body.field_string_1 ?? null,
+        field_string_2: req.body.field_string_2 ?? null,
+        field_string_3: req.body.field_string_3 ?? null,
+        field_bool_1: req.body.field_bool_1 ?? null,
+        field_bool_2: req.body.field_bool_2 ?? null,
+        field_bool_3: req.body.field_bool_3 ?? null,
+        field_text_1: req.body.field_text_1 ?? null,
+        field_text_2: req.body.field_text_2 ?? null,
+        field_text_3: req.body.field_text_3 ?? null,
+        field_date_1: req.body.field_date_1 ?? null,
+        field_date_2: req.body.field_date_2 ?? null,
+        field_date_3: req.body.field_date_3?? null,
+        CollectionId: req.body.id,
+        UserId: user.id
+      });
+    
+
+    res.status(200).json({ message: "Item added successfully" , item:item});
+  } catch (e) {
+    console.log(e);
     res.status(500).json({ error: e });
   }
 });

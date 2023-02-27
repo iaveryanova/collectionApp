@@ -52,7 +52,7 @@ const CollectionPage:React.FC = () => {
 
   let navigate = useNavigate();
   const createItem = () => {
-    navigate("/collection/:id/createitem");
+    navigate("/collection/" +  id + "/createitem");
   };
 
   const onCollectionList = () => {
