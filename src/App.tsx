@@ -19,6 +19,8 @@ import Cookies from 'js-cookie';
 
 interface UserContextType {
   token: string;
+  is_admin: boolean,
+  setIsAdmin: (is_admin: boolean) => void;
   setToken: (token: string) => void;
 }
 
@@ -28,6 +30,10 @@ export const App: React.FC = () => {
 
   const initToken = Cookies.get('token');
   const [token, setToken] = useState(initToken ? initToken : '');
+  const [is_admin, setIsAdmin] = useState(false);
+
+  let initColorMode = localStorage.getItem('colorMode') ?? 'light';
+  // const [colorMode, setColorMode] = useState(initColorMode ? initColorMode : 'light');
 
   useEffect(()=>{
     const initToken = Cookies.get('token');
@@ -35,12 +41,16 @@ export const App: React.FC = () => {
 })
 
 
-  const [mode, setMode] = React.useState<PaletteMode>("light");
+   // @ts-ignore
+   const [mode, setMode] = React.useState<PaletteMode>(initColorMode);
   const colorMode = React.useMemo(
     () => ({
       toggleColorMode: () => {
-        setMode((prevMode: PaletteMode) =>
-          prevMode === "light" ? "dark" : "light"
+        setMode((prevMode: PaletteMode) => {
+          const newMode = prevMode === "light" ? "dark" : "light";
+          localStorage.setItem('colorMode', newMode);
+          return newMode;
+        }
         );
       },
     }),
@@ -53,7 +63,7 @@ export const App: React.FC = () => {
   );
 
   return (
-    <UserContext.Provider value={ {token:token, setToken:setToken} }>
+    <UserContext.Provider value={ {token:token, is_admin:is_admin, setIsAdmin:setIsAdmin, setToken:setToken} }>
     <ColorContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline enableColorScheme />

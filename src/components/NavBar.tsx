@@ -18,6 +18,7 @@ import SwitchModeButton from "./SwitchModeButton";
 import {UserContext} from "../App";
 import Cookies from "js-cookie";
 import http from "../http";
+import {ColorContext} from "../ColorContext";
 
 interface Props {
   /**
@@ -33,6 +34,7 @@ const navItems = ["Home", "About", "Contact"];
 const NavBar: React.FC = (props: Props) => {
 
   const context = useContext(UserContext);
+  const theme = useContext(ColorContext)
 
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -45,7 +47,10 @@ const NavBar: React.FC = (props: Props) => {
     const res = await http.post('logout', []);
     const initToken = Cookies.get('token');
     context?.setToken(initToken ? initToken : '');
+   // theme?.setMode('light');
 
+   localStorage.removeItem('colorMode');
+   
     navigate('/');
   }
 

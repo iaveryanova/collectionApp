@@ -46,6 +46,7 @@ const CustomFieldsCollection = require("./models/CustomFieldsCollection")(
 
 const ItemCollections = require("./models/ItemCollections")(sequelize);
 const Comment = require("./models/Comment")(sequelize);
+const Like = require("./models/Like")(sequelize);
 
 //User-Collection
 User.hasMany(Collection);
@@ -69,41 +70,17 @@ Comment.belongsTo(User);
 ItemCollections.hasMany(Comment);
 Comment.belongsTo(ItemCollections);
 
-// sequelize.sync({ force: true });
+// Like - User - Item
+User.hasMany(Like);
+Like.belongsTo(User);
+ItemCollections.hasMany(Like);
+Like.belongsTo(ItemCollections);
 
-// const my_init = () => {
-//   ThemeCollection.create({name: 'theme1'});
-//   ThemeCollection.create({name: 'theme2'});
-//   ThemeCollection.create({name: 'theme3'});
-// }
-
-// my_init();
+// sequelize.sync({ alter: true });
 
 // const theme1 = ThemeCollection.create({ name: "Books" });
 // const theme2 = ThemeCollection.create({ name: "Coins" });
 // const theme3 = ThemeCollection.create({ name: "Pictures" });
-
-// ItemCollections.Collection = ItemCollections.belongsTo(Collection);
-// Collection.CustomFieldsCollection = Collection.hasMany(CustomFieldsCollection);
-
-// return ItemCollections.create({
-//   name: 'Book3',
-//   desc: 'Book3',
-//   Collection: {
-//     name: 'Books',
-//     desc: 'Books',
-//     CustomFieldsCollection: [{
-//       field_integer_1: "456",
-//       field_string: "string"
-
-//     }]
-//   }
-// }, {
-//   include: [{
-//     association: ItemCollections.Collection,
-//     include: [ Collection.CustomFieldsCollection ]
-//   }]
-// });
 
 const getUserByToken = async (token, res) => {
   if (token) {
@@ -300,11 +277,7 @@ app.get("/api/collections", async (req, res) => {
     include: ThemeCollection,
     where: { is_deleted: false, UserId: user.id },
   });
-  if (collections.length > 0) {
-    res.status(200).json({ collections: collections });
-  } else {
-    res.status(200).json({ collections: [] });
-  }
+  res.status(200).json({ collections: collections ?? [] });
 });
 
 app.get("/api/collection/:id", async (req, res) => {
@@ -334,13 +307,61 @@ app.get("/api/item/:id", async (req, res) => {
   const item = await ItemCollections.findByPk(req.params.id, {
     include: { all: true, nested: true },
     where: { is_deleted: false },
+    order: [ [Comment, 'id', 'desc']],
+  });
+  const isLiked = await Like.findOne({
+    where : {UserId: user.id, ItemCollectionId: item.id}
   });
   if (item !== null) {
-    res.status(200).json({ item: item });
+    res.status(200).json({ item: item, isLiked: (isLiked ? true : false) });
   } else {
     res.sendStatus(404);
   }
 });
+
+app.post("/api/item/like", async (req, res) => {
+  let token = req.cookies["token"];
+  const user = await getUserByToken(token, res);
+  if(req.body.id){
+    let like = null;
+    like = await Like.findOne({
+      UserId: user.id,
+      ItemCollectionId: req.body.id
+    })
+    if(like){
+      await like.destroy();
+      const listLike = await Like.findAll({where: {ItemCollectionId: req.body.id}});
+      res.status(200).json({ message: 'Like removed successfully.', isLiked: false, likes: listLike});
+    }
+    else{
+      like = await Like.create({
+        UserId: user.id,
+        ItemCollectionId: req.body.id
+      });
+      if(like){
+        const listLike = await Like.findAll({where: {ItemCollectionId: req.body.id}});
+        res.status(200).json({ message: 'Like added successfully.', isLiked: true, likes: listLike});
+      }
+    }
+  }
+  else{
+    res.sendStatus(400);
+  }
+});
+
+app.get("/api/item/:id/comments", async (req, res) => {
+  let token = req.cookies["token"];
+  const user = await getUserByToken(token, res);
+  const comments = await Comment.findAll({
+    include: { all: true, nested: true },
+    where: { is_deleted: false, ItemCollectionId: req.params.id },
+    order: [['id','desc']]
+  });
+
+    res.status(200).json(comments ?? [] );
+});
+
+
 
 app.post("/api/collections/delete", async (req, res) => {
   let token = req.cookies["token"];
@@ -407,7 +428,7 @@ app.post("/api/login", async (req, res) => {
     });
     await user.save();
     res.cookie("token", generate_token, cookie_options);
-    res.status(200).json({ message: "Login successfully" });
+    res.status(200).json({ message: "Login successfully", is_admin: user.is_admin });
   }
 });
 
@@ -423,6 +444,19 @@ app.post("/api/logout", async (req, res) => {
     res.status(200).json({ message: "Logout" });
   }
 });
+
+app.get('/api/users', async (req, res) => {
+
+  let token = req.cookies["token"];
+  const user = await getUserByToken(token, res);
+  if(!user.is_admin){
+    res.sendStatus(403);
+  }
+
+  const users = await User.findAll({where: {is_deleted: false}});
+  res.status(200).json(users ?? [] );
+})
+
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);

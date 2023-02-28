@@ -33,9 +33,18 @@ const AuthForm: React.FC = () => {
   const onFormSubmit: SubmitHandler<ISignInForm> = async (data) => {
     try {
       const res = await http.post('login', data);
-      const initToken = Cookies.get('token');
-      context?.setToken(initToken ? initToken : '');
-      navigate("/personal");
+      if(res.data){
+        const initToken = Cookies.get('token');
+        context?.setToken(initToken ? initToken : '');
+        if(res.data.is_admin){
+          context?.setIsAdmin(res.data.is_admin);
+          // localStorage.setItem('is_admin', 'is_admin');
+          navigate("/admin");
+        }
+        else{
+          navigate("/personal");
+        }
+      }
     }
     catch (err: any){
       if(err.response.status == 404) {

@@ -17,102 +17,107 @@ import {
 import { Button, Checkbox, TextField, Typography } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import {FavoriteBorder} from "@mui/icons-material";
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const ViewItemPage: React.FC = () => {
-  const createData = (property: string, value: string) => {
-    return { property, value };
-  };
+  // const createData = (property: string, value: string) => {
+  //   return { property, value };
+  // };
 
-  const [name, setName] = useState<any>([]);
-  const [date, setDate] = useState<any>([]);
-  const [collection, setCollection] = useState<any>([]);
-  const [user, setUser] = useState<any>([]);
-  const [customFieldsProperty, setCustomFieldsProperty] = useState<any>([]);
+  // const [name, setName] = useState<any>([]);
+  // const [date, setDate] = useState<any>([]);
+  // const [collection, setCollection] = useState<any>([]);
+  // const [user, setUser] = useState<any>([]);
+  // const [customFieldsProperty, setCustomFieldsProperty] = useState<any>([]);
   const [comments, setComments] = useState<any>([]);
-  const [customFieldsValue, setCustomFieldsValue] = useState<any>([]);
+  const [likes, setLikes] = useState<any>([]);
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+  // const [customFieldsValue, setCustomFieldsValue] = useState<any>([]);
+  const [fields, setFields] = useState<any>([]);
+
   const [item, setItem] = useState<any>([]);
 
-  const rows = [
-    createData("Name Item:", name),
-    createData("Date of creation", date),
-    createData("Collection", collection),
-    createData("Who created", user),
-  ];
+  // const rows = [
+  //   createData("Name Item:", name),
+  //   createData("Date of creation", date),
+  //   createData("Collection", collection),
+  //   createData("Who created", user),
+  // ];
+
+
 
   const { id } = useParams();
 
   useEffect(() => {
     if (id) {
       getDataByItemID(id);
+
+      const interval = setInterval(() => {
+        getIncomingComments(id);
+      }, 5000);
+      return () => clearInterval(interval);
     }
   }, []);
 
+  const getIncomingComments = async (id: string) => {
+    try {
+      const res = await http.get("item/" + id + "/comments");
+      setComments(res.data);
+      return res.data;
+    } catch (e) {
+      console.log(e);
+    }
+    return null;
+  };
+  const doLike = async () => {
+    try{
+      const res = await http.post("item/like", {id: id});
+      if(res){
+        setIsLiked(res.data.isLiked);
+        setLikes(res.data.likes)
+        return true;
+      }
+    }
+    catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
+
   const getDataByItemID = async (id: string) => {
     try {
-      let item = await http.get("/item/" + id);
-      if (item.data) {
-        console.log(item.data.item);
-        const obj_item = item.data.item;
+      let result = await http.get("/item/" + id);
+      if (result.data) {
+        console.log(result.data.item);
+        const item = result.data.item;
 
-        setItem(obj_item);
-        setName(obj_item.name);
-        setDate(obj_item.createdAt);
-        setCollection(obj_item.Collection.name);
-        setUser(obj_item.Collection.User.firstName);
-        setCustomFieldsProperty(obj_item.Collection.CustomFieldsCollections);
-        setComments(obj_item.Comments);
+        setItem(item);
+        // setName(obj_item.name);
+        // setDate(obj_item.createdAt);
+        // setCollection(obj_item.Collection.name);
+        // setUser(obj_item.Collection.User.firstName);
+        // setCustomFieldsProperty(obj_item.Collection.CustomFieldsCollections);
+        setComments(item.Comments);
+        setLikes(item.Likes);
+        setIsLiked(result.data.isLiked);
+
+        let fields_info = [
+          {property: "Name", value: item.name, field: 'name'},
+          {property: "Description", value: item.desc, field: 'desc'},
+          {property: "Collection", value: item.Collection.name, field: 'collection'},
+          {property: "Author", value: item.Collection.User.firstName + ' ' + item.Collection.User.lastName + ' (' + item.Collection.User.login + ')', field: 'user'},
+          {property: "Date of creation", value: new Date(item.createdAt).toLocaleString(), field: 'createdAt'},
+        ];
+
+        item.Collection.CustomFieldsCollections.map((field:any) => {
+          fields_info.push({property: field.name, value: item[field.custom_field], field: field.custom_field});
+        });
+
+        setFields(fields_info);
         setValue("id", id);
 
-        // let customFields = [];
-        // if (obj_item.field_bool_1 != null) {
-        //   customFields.push(obj_item.field_bool_1);
-        // }
-        // if (obj_item.field_bool_2 != null) {
-        //   customFields.push(obj_item.field_bool_2);
-        // }
-        // if (obj_item.field_bool_3 != null) {
-        //   customFields.push(obj_item.field_bool_3);
-        // }
-        // if (obj_item.field_date_1 != null) {
-        //   customFields.push(obj_item.field_date_1);
-        // }
-        // if (obj_item.field_date_2 != null) {
-        //   customFields.push(obj_item.field_date_2);
-        // }
-        // if (obj_item.field_date_3 != null) {
-        //   customFields.push(obj_item.field_date_3);
-        // }
-        // if (obj_item.field_integer_1 != null) {
-        //   customFields.push(obj_item.field_integer_1);
-        // }
-        // if (obj_item.field_integer_2 != null) {
-        //   customFields.push(obj_item.field_integer_2);
-        // }
-        // if (obj_item.field_integer_3 != null) {
-        //   customFields.push(obj_item.field_integer_3);
-        // }
-        // if (obj_item.field_string_1 != null) {
-        //   customFields.push(obj_item.field_string_1);
-        // }
-        // if (obj_item.field_string_2 != null) {
-        //   customFields.push(obj_item.field_string_2);
-        // }
-        // if (obj_item.field_string_3 != null) {
-        //   customFields.push(obj_item.field_string_3);
-        // }
-        // if (obj_item.field_text_1 != null) {
-        //   customFields.push(obj_item.field_text_1);
-        // }
-        // if (obj_item.field_text_2 != null) {
-        //   customFields.push(obj_item.field_text_2);
-        // }
-        // if (obj_item.field_text_3 != null) {
-        //   customFields.push(obj_item.field_text_3);
-        // }
-
-        // obj_item.Collection.CustomFieldsCollections
-
-        // setCustomFieldsValue(customFields);
       }
     } catch (err: any) {
       console.log(err);
@@ -135,6 +140,8 @@ const ViewItemPage: React.FC = () => {
     try {
       console.log(data);
       let res = await http.post("comment", data);
+
+      setValue('comment', '');
       console.log(res);
     } catch (err: any) {
       console.log(err);
@@ -143,8 +150,11 @@ const ViewItemPage: React.FC = () => {
 
   return (
     <div>
-      <TableContainer component={Paper} sx={{ width: 500 }}>
-        <Table sx={{ width: 500 }} aria-label="simple table">
+      <Typography variant="h4" gutterBottom>
+        View item - {item.id} : {item.name}
+      </Typography>
+      <TableContainer component={Paper} sx={{ width: 900 }}>
+        <Table sx={{ width: 900 }} aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell>Property</TableCell>
@@ -152,7 +162,7 @@ const ViewItemPage: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
+            {fields.map((row:any) => (
               <TableRow
                 key={row.property}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
@@ -160,54 +170,38 @@ const ViewItemPage: React.FC = () => {
                 <TableCell component="th" scope="row">
                   {row.property}
                 </TableCell>
-                <TableCell align="left">{row.value}</TableCell>
+                <TableCell align="left">
+                  {
+                    row.field.includes('field_date') ? new Date(row.value).toLocaleString() :
+                    row.field.includes('field_bool') ? <Checkbox disabled checked = {row.value} /> : row.value
+                  }
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
 
-      <div style={{ marginTop: "20px" }}>Custom Fields</div>
-      <div style={{ display: "flex" }}>
+      <Button
+        endIcon={ isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon /> }
+        type="submit"
+        variant="contained"
+        fullWidth={true}
+        disableElevation={true}
+        onClick={doLike}
+        sx={{
+          width: 100,
+          marginTop: "20px",
+        }}
+      >
+        {likes.length}
+      </Button>
 
-
-</div>
-<table>
-  <thead>
-    <tr>
-      <th>Property</th>
-      <th>Value</th>
-    </tr>
-  </thead>
-  <tbody>
-        {customFieldsProperty.map((option: any) => {
-           
-    
-          //  if(option.custom_field.includes('field_date')){
-
-          //  }
-          //  else{
-          //   if(option.custom_field.includes('field_bool')){
-          //   value = <Checkbox disabled checked />
-          //   }
-          //   else{
-          //     value = item[option.custom_field].toString();
-          //   }
-          //  }
-
-
-            return (<tr>
-              <td className="name">{option.name}</td>
-              <td className="value">{
-                option.custom_field.includes('field_date') ? new Date(item[option.custom_field]).toLocaleString() :
-                option.custom_field.includes('field_bool') ? <Checkbox disabled checked = {item[option.custom_field]} /> : item[option.custom_field]
-              }</td> 
-            </tr>);
-            
-              }
-          )}
-        </tbody>
-        </table>
+      <Typography variant="h5" gutterBottom sx={{
+        marginTop: "20px",
+      }}>
+        Comments: {comments.length ?? 0}
+      </Typography>
 
       <div
         style={{
@@ -217,15 +211,19 @@ const ViewItemPage: React.FC = () => {
           marginTop: "20px",
         }}
       >
-        <div>Comments:</div>
-        {comments.map((option: any) => (
-          <TextField
-            key={option.id}
-            id="outlined-basic"
-            variant="outlined"
-            defaultValue={option.text}
-            sx={{ width: "100%" }}
-          />
+        {comments &&
+          comments.map((comment: any) => (
+          // <TextField
+          //   key={option.id}
+          //   id="outlined-basic"
+          //   variant="outlined"
+          //   defaultValue={option.text}
+          //   sx={{ width: "100%" }}
+          // />
+            <div key={comment.id}>
+              <div>{ new Date(comment.createdAt).toLocaleString() + " - " + item.Collection.User.firstName + ' ' + item.Collection.User.lastName + ' (' + item.Collection.User.login + ')'}</div>
+              <div><p>{comment.text}</p></div>
+            </div>
         ))}
       </div>
 
@@ -281,19 +279,6 @@ const ViewItemPage: React.FC = () => {
         </Button>
       </form>
 
-      <Button
-        endIcon={<ThumbUpIcon />}
-        type="submit"
-        variant="contained"
-        fullWidth={true}
-        disableElevation={true}
-        sx={{
-          width: 100,
-          marginTop: "20px",
-        }}
-      >
-        Like
-      </Button>
     </div>
   );
 };

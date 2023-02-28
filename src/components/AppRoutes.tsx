@@ -11,6 +11,7 @@ import PersonalPage from '../pages/personal-page/PersonalPage';
 import ViewCollectionPage from '../pages/view-collection-page/ViewCollectionPage';
 import ViewItemPage from '../pages/view-item-page/ViewItemPage';
 import { UserContext } from '../App';
+import AdminPage from "../pages/admin/AdminPage";
 
 const AppRoutes: React.FC = () => {
   const context = useContext(UserContext);
@@ -29,6 +30,10 @@ const AppRoutes: React.FC = () => {
         <Route path="/viewitem" element={<ViewItemPage />} />
         <Route path="/item/:id" element={<ViewItemPage />} />
         <Route path="/item:id/edit" element={<CreateItemPage />} />
+
+        {context?.is_admin &&
+          <Route path="/admin" element={<AdminPage />} />
+      }
 
         <Route path="*" element={<Navigate to="/" replace/>} />
     </Routes>
