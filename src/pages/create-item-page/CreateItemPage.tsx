@@ -24,6 +24,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { fieldIntegerValidation, fieldStringValidation } from "./validation";
 
 interface ICreateItemForm {
+  collectionId: string;
   id: string;
   name: string;
   desc: string;
@@ -51,9 +52,9 @@ interface ICreateItemForm {
 
 const CreateItemPage: React.FC = () => {
 
-  const { id } = useParams();
+  const { id , itemId} = useParams();
   const [customFields, setCustomFields] = useState<any>([]);
-  const [collectionName, setCollectionName] = useState<any>([]);
+  const [collection, setCollection] = useState<any>([]);
 
   const getCustomFieldsByCollectionId = async (id: string) => {
     try {
@@ -61,17 +62,21 @@ const CreateItemPage: React.FC = () => {
 
       const obj_collection = collection.data.collection;
       setCustomFields(obj_collection.CustomFieldsCollections);
-      setCollectionName((obj_collection.name))
-      setValue("id", id);
+      setCollection((obj_collection))
+      setValue("collectionId", id)
     } catch (err: any) {
       console.log(err);
     }
   };
 
   useEffect(() => {
+    console.log(id, itemId)
     if (id) {
       getCustomFieldsByCollectionId(id);
+    } else if (itemId) {
+      getDataByItemID(itemId);
     }
+
   }, []);
 
   const { handleSubmit, control, reset, setValue } = useForm<ICreateItemForm>({
@@ -85,7 +90,7 @@ const CreateItemPage: React.FC = () => {
     try {
       console.log(data);
       let res = await http.post("/item/create", data);
-
+    
       onCollectionPage();
     } catch (err: any) {
       console.log(err);
@@ -96,12 +101,34 @@ const CreateItemPage: React.FC = () => {
 
   const navigate = useNavigate();
   const onCollectionPage = () => {
-    navigate("/collection/" + id);
+    navigate("/collection/" + collection.id);
   };
 
   const resetForm = () => {
     reset();
   };
+
+
+  const getDataByItemID = async (id: string) => {
+    try {
+      let result = await http.get("/item/" + id);
+      if (result.data) {
+        console.log(result.data.item);
+        const item = result.data.item;
+setCustomFields(item.Collection.CustomFieldsCollections);
+setCollection(item.Collection)
+
+        for (let key in item){
+          // @ts-ignore
+          setValue(key, item[key]);
+        }
+
+      }
+    } catch (err: any) {
+      console.log(err);
+    }
+  }; 
+
 
   return (
     <div>
@@ -110,7 +137,7 @@ const CreateItemPage: React.FC = () => {
       </Typography>
 
       <Typography variant="h5" gutterBottom>
-        Collection Name: {collectionName}
+        Collection Name: {collection.name}
       </Typography>
 
       <form
@@ -120,6 +147,14 @@ const CreateItemPage: React.FC = () => {
           width: "500px",
         }}
       >
+
+<Controller
+          control={control}
+          name="collectionId"
+          render={({ field }) => (
+            <input hidden readOnly value={field.value || ""} />
+          )}
+        />
 
 <Controller
           control={control}
@@ -168,7 +203,7 @@ const CreateItemPage: React.FC = () => {
           )}
         />
 
-        {customFields.map((option: any) => {
+        {/* {customFields.map((option: any) => {
           return (
             <Controller
               control={control}
@@ -228,7 +263,7 @@ const CreateItemPage: React.FC = () => {
               }}
             />
           );
-        })}
+        })} */}
 
 <div
           style={{

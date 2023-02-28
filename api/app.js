@@ -138,8 +138,37 @@ app.post("/api/item/create", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
 console.log(req.body);
+
+  let item = null;
   try {
-      let item = await ItemCollections.create({
+    if (req.body.id) {
+      item = await ItemCollections.findByPk(req.body.id);
+
+      if (!item) {
+        res.sendStatus(404);
+      }
+      item.name = req.body.name;
+      item.desc = req.body.desc,
+      item.field_integer_1 = req.body.field_integer_1 ?? null,
+      item.field_integer_2 = req.body.field_integer_2 ?? null,
+      item.field_integer_3 = req.body.field_integer_3 ?? null,
+      item.field_string_1 = req.body.field_string_1 ?? null,
+      item.field_string_2 = req.body.field_string_2 ?? null,
+      item.field_string_3 = req.body.field_string_3 ?? null,
+      item.field_bool_1 = req.body.field_bool_1 ?? null,
+      item.field_bool_2 = req.body.field_bool_2 ?? null,
+      item.field_bool_3 = req.body.field_bool_3 ?? null,
+      item.field_text_1 = req.body.field_text_1 ?? null,
+      item.field_text_2 = req.body.field_text_2 ?? null,
+      item.field_text_3 = req.body.field_text_3 ?? null,
+      item.field_date_1 = req.body.field_date_1 ?? null,
+      item.field_date_2 = req.body.field_date_2 ?? null,
+      item.field_date_3 = req.body.field_date_3?? null,
+      await item.save();
+    }
+    else {
+      console.log('tut')
+        item = await ItemCollections.create({
         name: req.body.name,
         desc: req.body.desc,
         field_integer_1: req.body.field_integer_1 ?? null,
@@ -157,12 +186,12 @@ console.log(req.body);
         field_date_1: req.body.field_date_1 ?? null,
         field_date_2: req.body.field_date_2 ?? null,
         field_date_3: req.body.field_date_3?? null,
-        CollectionId: req.body.id,
+        CollectionId: req.body.collectionId,
         UserId: user.id
       });
+      }
     
-
-    res.status(200).json({ message: "Item added successfully" , item:item});
+    res.status(200).json({ message: "Item saved successfully" , item:item});
   } catch (e) {
     console.log(e);
     res.status(500).json({ error: e });

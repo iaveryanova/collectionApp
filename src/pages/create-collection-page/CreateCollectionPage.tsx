@@ -69,8 +69,6 @@ const CreateCollectionPage: React.FC = () => {
         // @ts-ignore
         obj_collection.CustomFieldsCollections.forEach(field => setValue(field.custom_field, field.name))
 
-
-        // setCol(collection.data.collection);
         setValue('theme', obj_collection.ThemeCollection.id);
         setImg(collection.data.collection.image);
       }
@@ -80,6 +78,7 @@ const CreateCollectionPage: React.FC = () => {
   };
 
   useEffect(() => {
+    getThemes();
     if(id){
       getCollectionById(id);
     }
@@ -122,10 +121,6 @@ const CreateCollectionPage: React.FC = () => {
     setImg(null);
     reset();
   };
-
-  useEffect(() => {
-    getThemes();
-  }, []);
 
   const getThemes = async () => {
     try {

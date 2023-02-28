@@ -29,7 +29,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/viewcollection" element={<ViewCollectionPage />} />
         <Route path="/viewitem" element={<ViewItemPage />} />
         <Route path="/item/:id" element={<ViewItemPage />} />
-        <Route path="/item:id/edit" element={<CreateItemPage />} />
+        <Route path="/item/:itemId/edit" element={<CreateItemPage />} />
 
         {context?.is_admin &&
           <Route path="/admin" element={<AdminPage />} />
