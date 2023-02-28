@@ -21,22 +21,20 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { fieldIntegerValidation, fieldStringValidation } from "./validation";
 
 interface ICreateItemForm {
   id: string;
   name: string;
   desc: string;
-  theme: string;
-
-  image: FileList;
 
   field_string_1: string;
   field_string_2: string;
   field_string_3: string;
 
-  field_integer_1: string;
-  field_integer_2: string;
-  field_integer_3: string;
+  field_integer_1: number;
+  field_integer_2: number;
+  field_integer_3: number;
 
   field_text_1: string;
   field_text_2: string;
@@ -46,9 +44,9 @@ interface ICreateItemForm {
   field_date_2: string;
   field_date_3: string;
 
-  field_bool_1: string;
-  field_bool_2: string;
-  field_bool_3: string;
+  field_bool_1: boolean;
+  field_bool_2: boolean;
+  field_bool_3: boolean;
 }
 
 const CreateItemPage: React.FC = () => {
@@ -175,7 +173,9 @@ const CreateItemPage: React.FC = () => {
             <Controller
               control={control}
               name={option.custom_field}
-              // rules={{ required: true }}
+              rules= {
+                option.custom_field.includes("field_integer") ? fieldIntegerValidation : option.custom_field.includes("field_string") ? fieldStringValidation : { required: true }
+              }
               render={({ field }) => {
                 console.log();
 
@@ -184,7 +184,6 @@ const CreateItemPage: React.FC = () => {
                     <DatePicker
                       label={option.name}
                       value={field.value || null}
-                      // onChange={(newValue) => setDate(newValue)}
                       onChange={(e) => field.onChange(e)}
                       renderInput={(field) => (
                         <TextField sx={{ width: 500 }} {...field} />
@@ -220,6 +219,10 @@ const CreateItemPage: React.FC = () => {
                     fullWidth={true}
                     onChange={(e) => field.onChange(e)}
                     value={field.value || ""}
+                    //@ts-ignore
+                    error={!!errors[option.custom_field]?.message}
+                    //@ts-ignore
+              helperText={errors[option.custom_field]?.message}
                   />
                 );
               }}
