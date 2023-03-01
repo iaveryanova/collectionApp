@@ -12,12 +12,13 @@ import {
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import {useNavigate, useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import http from "../../http";
 
 interface ICreateCollectionForm {
-  id: number,
+  id: number;
+  author_id: string;
   name: string;
   desc: string;
   theme: string;
@@ -46,30 +47,32 @@ interface ICreateCollectionForm {
 }
 
 const CreateCollectionPage: React.FC = () => {
-  const { handleSubmit, control, reset, setValue } = useForm<ICreateCollectionForm>({
-    mode: "onChange",
-  });
+  const { handleSubmit, control, reset, setValue } =
+    useForm<ICreateCollectionForm>({
+      mode: "onChange",
+    });
   const { errors, isValid } = useFormState({
     control,
   });
 
+  const { id, userId } = useParams();
 
-  const {id} = useParams();
-
-  const getCollectionById = async (id:string) => {
+  const getCollectionById = async (id: string) => {
     try {
-      let collection = await http.get("/collection/" + id );
-      if(collection.data.collection){
+      let collection = await http.get("/collection/" + id);
+      if (collection.data.collection) {
         const obj_collection = collection.data.collection;
-        for (let key in obj_collection){
+        for (let key in obj_collection) {
           // @ts-ignore
           setValue(key, obj_collection[key]);
         }
 
         // @ts-ignore
-        obj_collection.CustomFieldsCollections.forEach(field => setValue(field.custom_field, field.name))
+        obj_collection.CustomFieldsCollections.forEach((field) =>
+          setValue(field.custom_field, field.name)
+        );
 
-        setValue('theme', obj_collection.ThemeCollection.id);
+        setValue("theme", obj_collection.ThemeCollection.id);
         setImg(collection.data.collection.image);
       }
     } catch (err: any) {
@@ -79,17 +82,20 @@ const CreateCollectionPage: React.FC = () => {
 
   useEffect(() => {
     getThemes();
-    if(id){
+    if (id) {
       getCollectionById(id);
     }
 
-  },[])
-
+    if (userId) {
+      setValue("author_id", userId);
+    }
+  }, []);
 
   const [img, setImg] = useState<any>(null);
 
   const onFormSubmit: SubmitHandler<ICreateCollectionForm> = async (data) => {
     try {
+      console.log(data);
       let res = await http.post("/collection/create", data, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -105,6 +111,11 @@ const CreateCollectionPage: React.FC = () => {
   const navigate = useNavigate();
   const onCollectionList = () => {
     navigate("/personal");
+    if (userId) {
+      navigate("/user/" + userId);
+    } else {
+      navigate("/personal");
+    }
   };
 
   const handleCapture = (files: FileList) => {
@@ -151,14 +162,17 @@ const CreateCollectionPage: React.FC = () => {
           control={control}
           name="id"
           render={({ field }) => (
-            <input
-              hidden
-              readOnly
-              value={field.value || ''}
-            />
+            <input hidden readOnly value={field.value || ""} />
           )}
         />
 
+        <Controller
+          control={control}
+          name="author_id"
+          render={({ field }) => (
+            <input hidden readOnly value={field.value || ""} />
+          )}
+        />
 
         <div
           style={{

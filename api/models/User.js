@@ -26,10 +26,11 @@ const { Sequelize, DataTypes } = require('sequelize');
     last_login: {
         type: DataTypes.DATE
     },
-    is_deleted: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+      comment: "1-active, 2-block, 0-deleted"
     },
     token: {
         type: DataTypes.STRING,

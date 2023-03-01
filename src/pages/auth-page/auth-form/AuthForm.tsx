@@ -38,10 +38,12 @@ const AuthForm: React.FC = () => {
         context?.setToken(initToken ? initToken : '');
         if(res.data.is_admin){
           context?.setIsAdmin(res.data.is_admin);
-          // localStorage.setItem('is_admin', 'is_admin');
+          localStorage.setItem('is_admin', '1');
           navigate("/admin");
         }
         else{
+          context?.setIsAdmin(res.data.is_admin);
+          localStorage.removeItem('is_admin');
           navigate("/personal");
         }
       }

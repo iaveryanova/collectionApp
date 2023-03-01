@@ -1,5 +1,5 @@
 const config = require("./config");
-const { Sequelize, DataTypes } = require("sequelize");
+const { Sequelize, DataTypes, Op } = require("sequelize");
 const express = require("express");
 const cors = require("cors");
 const crypto = require("crypto");
@@ -76,7 +76,7 @@ Like.belongsTo(User);
 ItemCollections.hasMany(Like);
 Like.belongsTo(ItemCollections);
 
-// sequelize.sync({ alter: true });
+// sequelize.sync({ alter: true, force: false });
 
 // const theme1 = ThemeCollection.create({ name: "Books" });
 // const theme2 = ThemeCollection.create({ name: "Coins" });
@@ -84,7 +84,13 @@ Like.belongsTo(ItemCollections);
 
 const getUserByToken = async (token, res) => {
   if (token) {
-    const user = await User.findOne({ where: { token: token } });
+    const user = await User.findOne({
+      where: {
+        token: token,
+        status: 1
+      }
+    });
+
     if (!user) {
       res.clearCookie("token");
       res.status(403).json({ message: "not found user" });
@@ -102,6 +108,9 @@ const getUserByToken = async (token, res) => {
 app.get("/api/themes", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
+  if(!user){
+    return;
+  }
 
   const themes = await ThemeCollection.findAll({
     where: { is_deleted: false },
@@ -116,6 +125,9 @@ app.get("/api/themes", async (req, res) => {
 app.post("/api/comment", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
+  if(!user){
+    return;
+  }
 
   let comment = null;
 
@@ -137,6 +149,9 @@ app.post("/api/comment", async (req, res) => {
 app.post("/api/item/create", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
+  if(!user){
+    return;
+  }
 console.log(req.body);
 
   let item = null;
@@ -201,6 +216,9 @@ console.log(req.body);
 app.post("/api/collection/create", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
+  if(!user){
+    return;
+  }
 
   let url_image = null;
 
@@ -228,6 +246,11 @@ app.post("/api/collection/create", async (req, res) => {
       if (!collection) {
         res.sendStatus(404);
       }
+
+      if(!(collection.UserId == user.id || user.is_admin)){
+        res.sendStatus(403);
+      }
+
       collection.desc = desc;
       collection.ThemeCollectionId = theme;
       collection.name = name;
@@ -240,7 +263,7 @@ app.post("/api/collection/create", async (req, res) => {
         name,
         image: url_image,
         ThemeCollectionId: theme,
-        UserId: user.id,
+        UserId: req.body.author_id ?? user.id,
       });
     }
 
@@ -300,7 +323,9 @@ app.post("/api/collection/create", async (req, res) => {
 app.get("/api/collections", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
-
+  if(!user){
+    return;
+  }
   //for admin - remove UserId where condition
   const collections = await Collection.findAll({
     include: ThemeCollection,
@@ -309,9 +334,69 @@ app.get("/api/collections", async (req, res) => {
   res.status(200).json({ collections: collections ?? [] });
 });
 
+
+app.get("/api/user/:id/collections", async (req, res) => {
+  let token = req.cookies["token"];
+  const user = await getUserByToken(token, res);
+  if(!user){
+    return;
+  }
+  if(!user.is_admin){
+    res.sendStatus(403);
+  }
+  //for admin - remove UserId where condition
+  const collections = await Collection.findAll({
+    include: [ThemeCollection, User],
+    where: { is_deleted: false, UserId: req.params.id },
+  });
+  // console.log(collections);
+  res.status(200).json({ collections: collections ?? [], author: collections ? collections[0].User : null});
+});
+
+app.get('/api/user/:id/:action', async (req, res) => {
+  let token = req.cookies["token"];
+  const user = await getUserByToken(token, res);
+  if(!user){
+    return;
+  }
+  if(!user.is_admin){
+    res.sendStatus(403);
+  }
+
+  const author = await User.findByPk(req.params.id);
+  if(!author){
+    res.sendStatus(404);
+  }
+  switch (req.params.action){
+    case 'to-admin':
+      author.is_admin = true;
+      break;
+
+    case 'to-block':
+      author.status = (author.status === 1) ? 2 : 1;
+      break;
+
+    case 'to-delete':
+      author.status = 0;
+      break;
+
+    default:
+      break;
+  }
+
+  await author.save();
+  res.status(200).json({ message: "User updated successfully" });
+
+});
+
+
+
 app.get("/api/collection/:id", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
+  if(!user){
+    return;
+  }
   const collection = await Collection.findByPk(req.params.id, {
     include: [
       {
@@ -340,6 +425,9 @@ app.get("/api/collection/:id", async (req, res) => {
 app.get("/api/item/:id", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
+  if(!user){
+    return;
+  }
   const item = await ItemCollections.findByPk(req.params.id, {
     include: { all: true, nested: true },
     where: { is_deleted: false },
@@ -358,6 +446,9 @@ app.get("/api/item/:id", async (req, res) => {
 app.post("/api/item/like", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
+  if(!user){
+    return;
+  }
   if(req.body.id){
     let like = null;
     like = await Like.findOne({
@@ -388,6 +479,9 @@ app.post("/api/item/like", async (req, res) => {
 app.get("/api/item/:id/comments", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
+  if(!user){
+    return;
+  }
   const comments = await Comment.findAll({
     include: { all: true, nested: true },
     where: { is_deleted: false, ItemCollectionId: req.params.id },
@@ -402,7 +496,9 @@ app.get("/api/item/:id/comments", async (req, res) => {
 app.post("/api/collections/delete", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
-
+  if(!user){
+    return;
+  }
   try {
     const ids = req.body.id;
     for (let i = 0; i < ids.length; i++) {
@@ -480,7 +576,7 @@ app.post("/api/login", async (req, res) => {
     where: {
       login: req.body.login,
       password: hash_password,
-      is_deleted: false,
+      status: 1,
     },
   });
   if (user === null) {
@@ -518,11 +614,21 @@ app.get('/api/users', async (req, res) => {
 
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
+  if(!user){
+    return;
+  }
   if(!user.is_admin){
     res.sendStatus(403);
   }
 
-  const users = await User.findAll({where: {is_deleted: false}});
+  const users = await User.findAll({
+    where: {
+      [Op.not]: [
+          {status:0}
+      ]
+    },
+    include: Collection
+  });
   res.status(200).json(users ?? [] );
 })
 

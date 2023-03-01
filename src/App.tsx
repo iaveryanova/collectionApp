@@ -30,10 +30,11 @@ export const App: React.FC = () => {
 
   const initToken = Cookies.get('token');
   const [token, setToken] = useState(initToken ? initToken : '');
-  const [is_admin, setIsAdmin] = useState(false);
+  const isAdmin = localStorage.getItem('is_admin') ? true : false;
+  const [is_admin, setIsAdmin] = useState(isAdmin);
 
   let initColorMode = localStorage.getItem('colorMode') ?? 'light';
-  // const [colorMode, setColorMode] = useState(initColorMode ? initColorMode : 'light');
+
 
   useEffect(()=>{
     const initToken = Cookies.get('token');

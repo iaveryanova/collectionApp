@@ -32,7 +32,12 @@ const AppRoutes: React.FC = () => {
         <Route path="/item/:itemId/edit" element={<CreateItemPage />} />
 
         {context?.is_admin &&
+          <>
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/user/:id" element={<PersonalPage />} />
+          <Route path="/user/:userId/collection/:id/edit" element={<CreateCollectionPage />} />
+          <Route path="/user/:userId/createcollection" element={<CreateCollectionPage />} />
+        </>
       }
 
         <Route path="*" element={<Navigate to="/" replace/>} />

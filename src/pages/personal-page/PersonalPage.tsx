@@ -4,7 +4,7 @@ import { Button, Stack, Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { GridSelectionModel } from "@mui/x-data-grid";
-import { Navigate, useNavigate } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import http from "../../http";
 import Cookies from "js-cookie";
@@ -16,95 +16,116 @@ interface ICollection {
   image: FileList;
 }
 
-const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 50 },
-  {
-    field: "name",
-    headerName: "Collection name",
-    width: 130,
-    renderCell: (params) => {
-      return (
-        <div>
-          <NavLink
-            to={"/collection/" + params.row.id}
-            style={{ textDecoration: "none" }}
-          >
-            {params.value}
-          </NavLink>
-        </div>
-      );
-    },
-  },
-  { field: "desc", headerName: "Short description", width: 300 },
-  {
-    field: "ThemeCollection",
-    headerName: "Theme",
-    width: 90,
-    renderCell: (params) => {
-      return <div>{params.value.name}</div>;
-    },
-  },
-  {
-    field: "image",
-    headerName: "Image",
-    width: 150,
-    renderCell: (params) => {
-      return (
-        <div>
-          <img
-            src={params.value || "./assets/place_img.jpg"}
-            alt=""
-            style={{ width: "100px", height: "100px", borderRadius: "50%" }}
-          />
-        </div>
-      );
-    },
-  },
-  {
-    field: "actions",
-    headerName: "Actions",
-    width: 100,
-    sortable: false,
-    renderCell: (params) => {
-      return (
-        <div>
-          <NavLink
-            to={"/collection/" + params.row.id + "/edit"}
-            style={{ textDecoration: "none" }}
-          >
-            <Button variant="outlined">
-              Edit
-            </Button>
-          </NavLink>
 
-        </div>
-      );
-    },
-  },
-];
 
 const PersonalPage: React.FC = () => {
   let navigate = useNavigate();
   const createCollection = () => {
-    navigate("/createcollection");
+    if(author){
+      navigate('/user/'+ author.id +"/createcollection")
+    }
+    else{
+      navigate("/createcollection");
+    }
   };
+
+  const columns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 50 },
+    {
+      field: "name",
+      headerName: "Collection name",
+      width: 130,
+      renderCell: (params) => {
+        return (
+          <div>
+            <NavLink
+              to={"/collection/" + params.row.id}
+              style={{ textDecoration: "none" }}
+            >
+              {params.value}
+            </NavLink>
+          </div>
+        );
+      },
+    },
+    { field: "desc", headerName: "Short description", width: 300 },
+    {
+      field: "ThemeCollection",
+      headerName: "Theme",
+      width: 90,
+      renderCell: (params) => {
+        return <div>{params.value.name}</div>;
+      },
+    },
+    {
+      field: "image",
+      headerName: "Image",
+      width: 150,
+      renderCell: (params) => {
+        return (
+          <div>
+            <img
+              src={params.value || "/assets/place_img.jpg"}
+              alt=""
+              style={{ width: "100px", height: "100px", borderRadius: "50%" }}
+            />
+          </div>
+        );
+      },
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 100,
+      sortable: false,
+      renderCell: (params) => {
+        return (
+          <div>
+            <NavLink
+              to={id ? "/user/" + id + "/collection/" + params.row.id + "/edit" : "/collection/" + params.row.id + "/edit"}
+              style={{ textDecoration: "none" }}
+            >
+              <Button variant="outlined">
+                Edit
+              </Button>
+            </NavLink>
+
+          </div>
+        );
+      },
+    },
+  ];
+
+  const {id} = useParams();
 
   const [selectedRows, setSelectedRows] =
     React.useState<GridSelectionModel | null>([]);
 
   const [collections, setCollections] = useState<any>([]);
+  const [author, setAuthor] = useState<any>(null);
 
   useEffect(() => {
-    getCollections();
+    getCollections(id ?? null);
   }, []);
 
   const rows = collections;
 
-  const getCollections = async () => {
+  const getCollections = async (id:string|null) => {
     try {
-      const collections = await http.get("/collections");
-      console.log(collections);
-      setCollections(collections.data.collections);
+      let collections = null;
+      if(id){
+        collections = await http.get("/user/" + id + "/collections");
+        if(collections){
+          setAuthor(collections.data.author);
+        }
+      }
+      else{
+        collections = await http.get("/collections");
+      }
+      if(collections){
+        console.log(collections);
+        setCollections(collections.data.collections);
+      }
     } catch (e) {
       console.log(e);
     }
@@ -114,7 +135,7 @@ const PersonalPage: React.FC = () => {
     try {
       const result = await http.post("/collections/delete", {id: selectedRows});
       if(result){
-        getCollections();
+        getCollections(id??null);
         
       }
     } catch (e) {
@@ -126,6 +147,7 @@ const PersonalPage: React.FC = () => {
     <>
       <Typography variant="h4" gutterBottom>
         My collections
+        { author ? <div>{author.firstName + ' ' + author.firstName} collections</div> : <div>My collections</div> }
       </Typography>
 
       <div

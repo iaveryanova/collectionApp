@@ -1,4 +1,4 @@
-import React, {useContext} from "react";
+import React, { useContext } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -15,10 +15,10 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import SwitchModeButton from "./SwitchModeButton";
-import {UserContext} from "../App";
+import { UserContext } from "../App";
 import Cookies from "js-cookie";
 import http from "../http";
-import {ColorContext} from "../ColorContext";
+import { ColorContext } from "../ColorContext";
 
 interface Props {
   /**
@@ -32,9 +32,8 @@ const drawerWidth = 240;
 const navItems = ["Home", "About", "Contact"];
 
 const NavBar: React.FC = (props: Props) => {
-
   const context = useContext(UserContext);
-  const theme = useContext(ColorContext)
+  const theme = useContext(ColorContext);
 
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -44,15 +43,17 @@ const NavBar: React.FC = (props: Props) => {
   const navigate = useNavigate();
 
   const logout = async () => {
-    const res = await http.post('logout', []);
-    const initToken = Cookies.get('token');
-    context?.setToken(initToken ? initToken : '');
-   // theme?.setMode('light');
+    const res = await http.post("logout", []);
+    const initToken = Cookies.get("token");
+    context?.setToken(initToken ? initToken : "");
+    // theme?.setMode('light');
 
-   localStorage.removeItem('colorMode');
-   
-    navigate('/');
-  }
+    context?.setIsAdmin(false);
+    localStorage.removeItem("colorMode");
+    localStorage.removeItem("is_admin");
+
+    navigate("/");
+  };
 
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
@@ -90,7 +91,7 @@ const NavBar: React.FC = (props: Props) => {
             <MenuIcon />
           </IconButton>
           <Typography
-          onClick={() => navigate("")}
+            onClick={() => navigate("")}
             variant="h6"
             component="div"
             sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
@@ -98,9 +99,13 @@ const NavBar: React.FC = (props: Props) => {
             MUI
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
-
-            {context?.token ?
+            {context?.token ? (
               <>
+                {context?.is_admin && (
+                  <Button color="inherit" onClick={() => navigate("admin")}>
+                    Users
+                  </Button>
+                )}
                 <Button color="inherit" onClick={() => navigate("personal")}>
                   My collections
                 </Button>
@@ -108,11 +113,11 @@ const NavBar: React.FC = (props: Props) => {
                   Logout
                 </Button>
               </>
-              :
+            ) : (
               <Button color="inherit" onClick={() => navigate("auth")}>
                 Login
               </Button>
-            }
+            )}
 
             {/* <Button color="inherit" onClick={() => navigate("collectionpage")}>
               Collection page
