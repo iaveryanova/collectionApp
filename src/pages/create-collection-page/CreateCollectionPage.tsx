@@ -77,6 +77,7 @@ const CreateCollectionPage: React.FC = () => {
       }
     } catch (err: any) {
       console.log(err);
+      navigate('/personal');
     }
   };
 

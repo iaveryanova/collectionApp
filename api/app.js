@@ -409,8 +409,13 @@ app.get("/api/collection/:id", async (req, res) => {
     where: { is_deleted: false },
     // order: [ [ItemCollections, 'createdAt', 'ASC']],
   });
-  if (collection !== null) {
-    res.status(200).json({ collection: collection });
+  if (collection) {
+    if(collection.UserId == user.id || user.is_admin){
+      res.status(200).json({ collection: collection });
+    }
+    else{
+      res.sendStatus(403);
+    }
   } else {
     res.sendStatus(404);
   }
@@ -436,8 +441,9 @@ app.get("/api/item/:id", async (req, res) => {
   const isLiked = await Like.findOne({
     where : {UserId: user.id, ItemCollectionId: item.id}
   });
-  if (item !== null) {
-    res.status(200).json({ item: item, isLiked: (isLiked ? true : false) });
+  if (item) {
+    const canEdit = item.Collection.UserId == user.id || user.is_admin;
+    res.status(200).json({ item: item, isLiked: (isLiked ? true : false), canEdit: canEdit});
   } else {
     res.sendStatus(404);
   }
@@ -451,9 +457,10 @@ app.post("/api/item/like", async (req, res) => {
   }
   if(req.body.id){
     let like = null;
-    like = await Like.findOne({
+    like = await Like.findOne({where: {
       UserId: user.id,
       ItemCollectionId: req.body.id
+    }
     })
     if(like){
       await like.destroy();

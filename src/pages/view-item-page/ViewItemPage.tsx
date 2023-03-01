@@ -88,7 +88,7 @@ const ViewItemPage: React.FC = () => {
 
   const getDataByItemID = async (id: string) => {
     try {
-      let result = await http.get("/item/" + id);
+      let result = await http.get("item/" + id);
       if (result.data) {
         console.log(result.data.item);
         const item = result.data.item;

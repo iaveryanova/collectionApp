@@ -113,16 +113,21 @@ const CreateItemPage: React.FC = () => {
     try {
       let result = await http.get("/item/" + id);
       if (result.data) {
-        console.log(result.data.item);
-        const item = result.data.item;
-setCustomFields(item.Collection.CustomFieldsCollections);
-setCollection(item.Collection)
+        if(result.data.canEdit){
+          console.log(result.data.item);
+          const item = result.data.item;
+          setCustomFields(item.Collection.CustomFieldsCollections);
+          setCollection(item.Collection);
 
-        for (let key in item){
-          // @ts-ignore
-          setValue(key, item[key]);
+          for (let key in item){
+            // @ts-ignore
+            setValue(key, item[key]);
+          }
         }
-
+        else{
+          // alert('You cannot edit this item');
+          navigate('/personal');
+        }
       }
     } catch (err: any) {
       console.log(err);
@@ -203,13 +208,13 @@ setCollection(item.Collection)
           )}
         />
 
-        {/* {customFields.map((option: any) => {
+        {customFields.map((option: any) => {
           return (
             <Controller
               control={control}
               name={option.custom_field}
-              rules= {
-                option.custom_field.includes("field_integer") ? fieldIntegerValidation : option.custom_field.includes("field_string") ? fieldStringValidation : { required: true }
+              rules= { 
+                option.custom_field.includes("field_integer") ? fieldIntegerValidation : option.custom_field.includes("field_string") ? fieldStringValidation :  {}
               }
               render={({ field }) => {
                 console.log();
@@ -263,7 +268,7 @@ setCollection(item.Collection)
               }}
             />
           );
-        })} */}
+        })}
 
 <div
           style={{

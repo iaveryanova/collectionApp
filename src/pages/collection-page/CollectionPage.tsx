@@ -23,7 +23,7 @@ const columns: GridColDef[] = [
     );
   }, 
 },
-{ field: 'createdAt', headerName: 'Date of creation', width: 150, renderCell: (params) => (new Date(params.row.createdAt).toLocaleString()) },
+{ field: 'createdAt', headerName: 'Date of creation', width: 180, renderCell: (params) => (new Date(params.row.createdAt).toLocaleString()) },
   {
     field: "actions",
     headerName: "Actions",

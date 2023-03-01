@@ -146,7 +146,6 @@ const PersonalPage: React.FC = () => {
   return (
     <>
       <Typography variant="h4" gutterBottom>
-        My collections
         { author ? <div>{author.firstName + ' ' + author.firstName} collections</div> : <div>My collections</div> }
       </Typography>
 
