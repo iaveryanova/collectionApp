@@ -313,7 +313,14 @@ app.get("/api/collection/:id", async (req, res) => {
   let token = req.cookies["token"];
   const user = await getUserByToken(token, res);
   const collection = await Collection.findByPk(req.params.id, {
-    include: { all: true, nested: true },
+    include: [
+      {
+        model: ItemCollections,
+        where: { is_deleted: false }
+      },
+      CustomFieldsCollection,
+      User
+    ],
     where: { is_deleted: false },
     // order: [ [ItemCollections, 'createdAt', 'ASC']],
   });
@@ -415,6 +422,39 @@ app.post("/api/collections/delete", async (req, res) => {
     res.status(500).json({ error: e });
   }
 });
+
+
+
+app.post("/api/items/delete", async (req, res) => {
+  let token = req.cookies["token"];
+  const user = await getUserByToken(token, res);
+  if (!user) {
+    return;
+  }
+
+  try {
+    const ids = req.body.id;
+    for (let i = 0; i < ids.length; i++) {
+      const item = await ItemCollections.findByPk(ids[i],{
+        include : Collection
+      });
+      if (item) {
+        if (item.Collection.UserId == user.id || user.is_admin) {
+          item.is_deleted = 1;
+        await item.save();
+        }
+      
+      }
+    }
+
+    res.status(200).json({ ids: ids });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ error: e });
+  }
+});
+
+
 
 app.post("/api/register", async (req, res) => {
   const { firstName, lastName, email, login, password, token } = req.body;

@@ -52,7 +52,7 @@ const CollectionPage:React.FC = () => {
 
   let navigate = useNavigate();
   const createItem = () => {
-    navigate("/collection/" +  id + "/createitem");
+    navigate("/collection/" +  colId + "/createitem");
   };
 
   const onCollectionList = () => {
@@ -62,11 +62,11 @@ const CollectionPage:React.FC = () => {
   const [selectedRows, setSelectedRows] =
     React.useState<GridSelectionModel | null>([]);
 
-  const {id} = useParams();
+  const {colId} = useParams();
 
   useEffect(() => {
-    if (id) {
-      getItemsByCollectionID(id);
+    if (colId) {
+      getItemsByCollectionID(colId);
     }
   },[])
 
@@ -76,19 +76,34 @@ const CollectionPage:React.FC = () => {
 
   const rows = items;
 
-  const getItemsByCollectionID = async (id:string) => {
+  const getItemsByCollectionID = async (id:string|null) => {
     try {
-      let collection = await http.get("/collection/" + id );
+      if (id) {
+        let collection = await http.get("/collection/" + id );
       if(collection.data.collection){
         const obj_collection = collection.data.collection;
 
         setItems(obj_collection.ItemCollections)
         setName(obj_collection.name)
       }
+      }
     } catch (err: any) {
       console.log(err);
     }
   };
+
+
+  const deleteAction = async () => {
+    try {
+      const result = await http.post("/items/delete", {id: selectedRows});
+      if(result){
+        getItemsByCollectionID(colId??null);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
 
   return (
 <>
@@ -113,7 +128,7 @@ const CollectionPage:React.FC = () => {
         <Button
           variant="outlined"
           startIcon={<DeleteIcon />}
-          // onClick={deleteAction}
+          onClick={deleteAction}
           disabled={!selectedRows || selectedRows.length == 0}
         >
           Delete
