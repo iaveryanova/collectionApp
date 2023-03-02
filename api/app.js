@@ -421,11 +421,6 @@ app.get("/api/collection/:id", async (req, res) => {
   }
 });
 
-//ItemColl.findAll({
-  // include: { all: true, nested: true }
-  // where: { is_deleted: false },
-  // order: [ ['createdAt', 'ASC']],
-  // limit: 3;
 
 app.get("/api/item/:id", async (req, res) => {
   let token = req.cookies["token"];
@@ -637,6 +632,17 @@ app.get('/api/users', async (req, res) => {
     include: Collection
   });
   res.status(200).json(users ?? [] );
+})
+
+app.get('/api/items', async (req, res) => {
+
+  const items = await ItemCollections.findAll({
+    where: { is_deleted: false },
+    include: { all: true, nested: true },
+    limit: 3,
+    order: [['createdAt', 'DESC']],
+  });
+  res.status(200).json(items ?? [] );
 })
 
 

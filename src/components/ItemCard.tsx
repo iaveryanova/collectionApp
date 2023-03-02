@@ -5,13 +5,18 @@ import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
-const ItemCard: React.FC = () => {
+type PropTypes = {
+  id:string,
+ date: string,
+ name: string,
+ user: string,
+ collection: string
+};
+
+const ItemCard: React.FC<PropTypes> = (props) => {
     const navigate = useNavigate();
-    const onClick = () => {
-        navigate('/viewitem')
-    }
 
   const bull = (
     <Box
@@ -26,20 +31,26 @@ const ItemCard: React.FC = () => {
     <React.Fragment>
       <CardContent>
         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-          Date of creation
+          {new Date(props.date).toLocaleString()}
         </Typography>
         <Typography variant="h5" component="div">
-          Item Name
+          {props.name}
         </Typography>
         <Typography sx={{ mb: 1.5 }} color="text.secondary">
-          User
+          {props.user}
         </Typography>
         <Typography variant="body2">
-          Collection
+          {props.collection}
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small" onClick={onClick}>Learn More</Button>
+      <NavLink
+                to={"/item/" + props.id}
+                style={{ textDecoration: "none" }}
+              >
+        <Button size="small">Learn More</Button>
+        </NavLink>
+        
       </CardActions>
     </React.Fragment>
   );

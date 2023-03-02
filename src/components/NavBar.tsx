@@ -58,7 +58,7 @@ const NavBar: React.FC = (props: Props) => {
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
       <Typography variant="h6" sx={{ my: 2 }}>
-        MUI
+        HOME PAGE
       </Typography>
       <Divider />
       <List>
@@ -96,7 +96,7 @@ const NavBar: React.FC = (props: Props) => {
             component="div"
             sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
           >
-            MUI
+            HOME PAGE
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
             {context?.token ? (
