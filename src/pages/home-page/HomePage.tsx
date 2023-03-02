@@ -4,6 +4,7 @@ import ItemCard from "../../components/ItemCard";
 import http from "../../http";
 import { useEffect, useState } from "react";
 import CollectionCard from "../../components/CollectionCard";
+import { FormattedMessage } from "react-intl";
 
 const HomePage: React.FC = () => {
   const [items, setItems] = useState<any>([]);
@@ -38,7 +39,7 @@ const HomePage: React.FC = () => {
     <>
       {/* На главной странице отображаются: последние добавленные айтемы, коллекции с самым большим числом айтемов, кликабельное облако тэгов (при клике результат - список ссылок на айтемы, аналогично результатам поиска, по сути это может быть одна вьюшка). */}
       <Typography variant="h5" gutterBottom mt={2}>
-        Recently added items
+        <FormattedMessage id="app.home-page.header1" />
       </Typography>
 
       <div
@@ -65,7 +66,7 @@ const HomePage: React.FC = () => {
 
 
       <Typography variant="h5" gutterBottom mt={2}>
-      Collections with the largest number of items
+      <FormattedMessage id="app.home-page.header2" />
       </Typography>
 
       <div

@@ -1,0 +1,14 @@
+{
+    "app.home-page.header1": "Recently added items",
+    "app.home-page.header2": "Collections with the largest number of items",
+    "app.home-page.button1":"Learn more",
+    "app.personal-page.header": "My collections",
+    "app.personal-page.table.header1": "Collection name",
+    "app.personal-page.table.header2": "Short description",
+    "app.personal-page.table.header3": "Theme",
+    "app.personal-page.table.header4": "Image",
+    "app.personal-page.table.header5": "Actions",
+    "app.personal-page.table.button-edit": "Edit",
+    "app.personal-page.table.button-delete": "Delete",
+    "app.personal-page.table.button-add": "Add collections"
+}

@@ -6,6 +6,7 @@ import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { NavLink, useNavigate } from "react-router-dom";
+import { FormattedMessage } from "react-intl";
 
 type PropTypes = {
   id: string;
@@ -44,7 +45,7 @@ const CollectionCard: React.FC<PropTypes> = (props) => {
           to={"/collection/" + props.id}
           style={{ textDecoration: "none" }}
         >
-          <Button size="small">Learn More</Button>
+          <Button size="small"><FormattedMessage id="app.home-page.button1" /></Button>
         </NavLink>
       </CardActions>
     </React.Fragment>

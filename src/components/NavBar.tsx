@@ -14,11 +14,13 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
-import SwitchModeButton from "./SwitchModeButton";
 import { UserContext } from "../App";
 import Cookies from "js-cookie";
 import http from "../http";
 import { ColorContext } from "../ColorContext";
+import SwitchModeButton from "./SwitchModeButton";
+import SwitchLocale from "./SwitchLocale";
+
 
 interface Props {
   /**
@@ -46,7 +48,6 @@ const NavBar: React.FC = (props: Props) => {
     const res = await http.post("logout", []);
     const initToken = Cookies.get("token");
     context?.setToken(initToken ? initToken : "");
-    // theme?.setMode('light');
 
     context?.setIsAdmin(false);
     localStorage.removeItem("colorMode");
@@ -119,11 +120,8 @@ const NavBar: React.FC = (props: Props) => {
               </Button>
             )}
 
-            {/* <Button color="inherit" onClick={() => navigate("collectionpage")}>
-              Collection page
-            </Button> */}
-
             <SwitchModeButton />
+            <SwitchLocale />
           </Box>
         </Toolbar>
       </AppBar>
@@ -145,6 +143,7 @@ const NavBar: React.FC = (props: Props) => {
           {drawer}
         </Drawer>
       </Box>
+      
     </Box>
   );
 };

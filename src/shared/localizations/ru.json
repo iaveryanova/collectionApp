@@ -1,0 +1,14 @@
+{
+    "app.home-page.header1": "Последние добавленные айтемы",
+    "app.home-page.header2": "Коллекции с самым большим числом айтемов",
+    "app.home-page.button1":"Узнать больше",
+    "app.personal-page.header": "Мои коллекции",
+    "app.personal-page.table.header1": "Название коллекции",
+    "app.personal-page.table.header2": "Краткое описание",
+    "app.personal-page.table.header3": "Tема",
+    "app.personal-page.table.header4": "Изображение",
+    "app.personal-page.table.header5": "Действия",
+    "app.personal-page.table.button-edit": "Редактировать",
+    "app.personal-page.table.button-delete": "Удалить",
+    "app.personal-page.table.button-add": "Добавить коллекцию"
+}

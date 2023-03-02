@@ -13,8 +13,12 @@ import { darkTheme } from "./themes/dark";
 import { lightTheme } from "./themes/light";
 import { ColorContext } from "./ColorContext";
 import Cookies from 'js-cookie';
-
-
+import ruMessages from "./shared/localizations/ru.json";
+import enMessages from "./shared/localizations/en.json";
+import { IntlProvider } from "react-intl";
+import locales from "./shared/constants/locales"
+import GlobalContext from "./shared/contexts/GlobalContext";
+import localStorageKeys from "./shared/constants/localStorageKeys";
 
 
 interface UserContextType {
@@ -26,12 +30,20 @@ interface UserContextType {
 
 export const UserContext = React.createContext<UserContextType | null>(null);
 
+const messages = {
+  [locales.EN]: enMessages,
+  [locales.RU]: ruMessages,
+}
+
 export const App: React.FC = () => {
 
   const initToken = Cookies.get('token');
   const [token, setToken] = useState(initToken ? initToken : '');
   const isAdmin = localStorage.getItem('is_admin') ? true : false;
   const [is_admin, setIsAdmin] = useState(isAdmin);
+  const [currentLocale, setCurrentLocale] = useState(
+    localStorage.getItem(localStorageKeys.LOCALE || locales.EN)
+  )
 
   let initColorMode = localStorage.getItem('colorMode') ?? 'light';
 
@@ -63,8 +75,25 @@ export const App: React.FC = () => {
     [mode]
   );
 
+  const setLocale = (value: string) => {
+    setCurrentLocale(value);
+    localStorage.setItem(localStorageKeys.LOCALE, value);
+
+  }
+
   return (
-    <UserContext.Provider value={ {token:token, is_admin:is_admin, setIsAdmin:setIsAdmin, setToken:setToken} }>
+    <GlobalContext.Provider value={ {
+      //@ts-ignore
+      currentLocale:currentLocale,
+      setCurrentLocale: setLocale,
+    } }>
+      
+      <IntlProvider 
+      //@ts-ignore
+      locale={currentLocale} 
+      //@ts-ignore
+      messages={messages[currentLocale]}>
+      <UserContext.Provider value={ {token:token, is_admin:is_admin, setIsAdmin:setIsAdmin, setToken:setToken} }>
     <ColorContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline enableColorScheme />
@@ -72,9 +101,13 @@ export const App: React.FC = () => {
           <NavBar />
           <AppRoutes />
         </BrowserRouter>
-      </ThemeProvider>
+      </ThemeProvider> 
     </ColorContext.Provider>
     </UserContext.Provider>
+    </IntlProvider>
+    </GlobalContext.Provider>
+    
+    
   );
 }
 
