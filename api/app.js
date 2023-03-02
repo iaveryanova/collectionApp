@@ -650,6 +650,16 @@ app.get('/api/items', async (req, res) => {
   res.status(200).json(items ?? [] );
 })
 
+app.get('/api/collections', async (req, res) => {
+
+  const collections = await Collection.findAll({
+    where: { is_deleted: false },
+    include: { all: true, nested: true },
+    limit: 3
+  });
+  res.status(200).json(collections ?? [] );
+})
+
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`);

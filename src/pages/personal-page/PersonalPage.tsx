@@ -123,7 +123,6 @@ const PersonalPage: React.FC = () => {
         collections = await http.get("/collections");
       }
       if(collections){
-        console.log(collections);
         setCollections(collections.data.collections);
       }
     } catch (e) {

@@ -148,7 +148,6 @@ const AdminPage: React.FC = () => {
   const getUsers = async () => {
     try {
       const users = await http.get("/users");
-      console.log(users);
       setUsers(users.data);
     } catch (e) {
       console.log(e);

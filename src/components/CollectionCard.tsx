@@ -11,11 +11,9 @@ type PropTypes = {
   id: string;
   date: string;
   name: string;
-  user: string;
-  collection: string;
 };
 
-const ItemCard: React.FC<PropTypes> = (props) => {
+const CollectionCard: React.FC<PropTypes> = (props) => {
   const navigate = useNavigate();
 
   const bull = (
@@ -37,12 +35,15 @@ const ItemCard: React.FC<PropTypes> = (props) => {
           {props.name}
         </Typography>
         <Typography sx={{ mb: 1.5 }} color="text.secondary">
-          {props.user}
+          user
         </Typography>
-        <Typography variant="body2">{props.collection}</Typography>
+        <Typography variant="body2">number of items</Typography>
       </CardContent>
       <CardActions>
-        <NavLink to={"/item/" + props.id} style={{ textDecoration: "none" }}>
+        <NavLink
+          to={"/collection/" + props.id}
+          style={{ textDecoration: "none" }}
+        >
           <Button size="small">Learn More</Button>
         </NavLink>
       </CardActions>
@@ -55,4 +56,4 @@ const ItemCard: React.FC<PropTypes> = (props) => {
   );
 };
 
-export default ItemCard;
+export default CollectionCard;

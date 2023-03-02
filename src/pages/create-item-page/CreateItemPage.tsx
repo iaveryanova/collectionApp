@@ -70,7 +70,6 @@ const CreateItemPage: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log(id, itemId)
     if (id) {
       getCustomFieldsByCollectionId(id);
     } else if (itemId) {
@@ -88,7 +87,6 @@ const CreateItemPage: React.FC = () => {
 
   const onFormSubmit: SubmitHandler<any> = async (data) => {
     try {
-      console.log(data);
       let res = await http.post("/item/create", data);
     
       onCollectionPage();
@@ -114,7 +112,6 @@ const CreateItemPage: React.FC = () => {
       let result = await http.get("/item/" + id);
       if (result.data) {
         if(result.data.canEdit){
-          console.log(result.data.item);
           const item = result.data.item;
           setCustomFields(item.Collection.CustomFieldsCollections);
           setCollection(item.Collection);
@@ -211,14 +208,13 @@ const CreateItemPage: React.FC = () => {
         {customFields.map((option: any) => {
           return (
             <Controller
+            key={option.id}
               control={control}
               name={option.custom_field}
               rules= { 
                 option.custom_field.includes("field_integer") ? fieldIntegerValidation : option.custom_field.includes("field_string") ? fieldStringValidation :  {}
               }
               render={({ field }) => {
-                console.log();
-
                 return option.custom_field.includes("field_date") ? (
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker

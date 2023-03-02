@@ -46,7 +46,6 @@ const RegisterForm: React.FC = (props) => {
     } else {
       try{
         let res = await http.post('/register', data);
-        console.log(data);
         alert("Congratulations, you are registered!");
         navigate("/auth");
       }

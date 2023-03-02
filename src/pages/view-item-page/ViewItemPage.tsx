@@ -16,37 +16,16 @@ import {
 } from "react-hook-form";
 import { Button, Checkbox, TextField, Typography } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import {FavoriteBorder} from "@mui/icons-material";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const ViewItemPage: React.FC = () => {
-  // const createData = (property: string, value: string) => {
-  //   return { property, value };
-  // };
 
-  // const [name, setName] = useState<any>([]);
-  // const [date, setDate] = useState<any>([]);
-  // const [collection, setCollection] = useState<any>([]);
-  // const [user, setUser] = useState<any>([]);
-  // const [customFieldsProperty, setCustomFieldsProperty] = useState<any>([]);
   const [comments, setComments] = useState<any>([]);
   const [likes, setLikes] = useState<any>([]);
   const [isLiked, setIsLiked] = useState<boolean>(false);
-  // const [customFieldsValue, setCustomFieldsValue] = useState<any>([]);
   const [fields, setFields] = useState<any>([]);
-
   const [item, setItem] = useState<any>([]);
-
-  // const rows = [
-  //   createData("Name Item:", name),
-  //   createData("Date of creation", date),
-  //   createData("Collection", collection),
-  //   createData("Who created", user),
-  // ];
-
-
 
   const { id } = useParams();
 
@@ -90,15 +69,9 @@ const ViewItemPage: React.FC = () => {
     try {
       let result = await http.get("item/" + id);
       if (result.data) {
-        console.log(result.data.item);
         const item = result.data.item;
 
         setItem(item);
-        // setName(obj_item.name);
-        // setDate(obj_item.createdAt);
-        // setCollection(obj_item.Collection.name);
-        // setUser(obj_item.Collection.User.firstName);
-        // setCustomFieldsProperty(obj_item.Collection.CustomFieldsCollections);
         setComments(item.Comments);
         setLikes(item.Likes);
         setIsLiked(result.data.isLiked);
@@ -138,11 +111,9 @@ const ViewItemPage: React.FC = () => {
 
   const onFormSubmit: SubmitHandler<ISendCommentForm> = async (data) => {
     try {
-      console.log(data);
       let res = await http.post("comment", data);
 
       setValue('comment', '');
-      console.log(res);
     } catch (err: any) {
       console.log(err);
     }
@@ -213,13 +184,6 @@ const ViewItemPage: React.FC = () => {
       >
         {comments &&
           comments.map((comment: any) => (
-          // <TextField
-          //   key={option.id}
-          //   id="outlined-basic"
-          //   variant="outlined"
-          //   defaultValue={option.text}
-          //   sx={{ width: "100%" }}
-          // />
             <div key={comment.id}>
               <div>{ new Date(comment.createdAt).toLocaleString() + " - " + item.Collection.User.firstName + ' ' + item.Collection.User.lastName + ' (' + item.Collection.User.login + ')'}</div>
               <div><p>{comment.text}</p></div>
@@ -243,7 +207,6 @@ const ViewItemPage: React.FC = () => {
         <Controller
           control={control}
           name="comment"
-          // rules={loginValidation}
           render={({ field }) => (
             <TextField
               multiline

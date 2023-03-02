@@ -14,9 +14,9 @@ export const loginValidation = {
 export const passwordValidation = {
     required: REQUIRED_FIELD,
     validate: (value: string) => {
-        // if(value.length < 6) {
-        //     return 'The password must contain at least 6 characters.'
-        // }
+        if(value.length < 6) {
+            return 'The password must contain at least 6 characters.'
+        }
         return true;
     }
 };
@@ -24,10 +24,10 @@ export const passwordValidation = {
 export const emailValidation = {
     required: REQUIRED_FIELD,
     validate: (value: string) => {
-        // if (value.match(/\S+@\S+\.\S+/)) {
-        //    return true; 
-        // }
-        // return 'Email is invalid'
+        if (value.match(/\S+@\S+\.\S+/)) {
+           return true; 
+        }
+        return 'Email is invalid'
         return true;
     }
 };

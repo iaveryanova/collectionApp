@@ -96,7 +96,6 @@ const CreateCollectionPage: React.FC = () => {
 
   const onFormSubmit: SubmitHandler<ICreateCollectionForm> = async (data) => {
     try {
-      console.log(data);
       let res = await http.post("/collection/create", data, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -138,7 +137,6 @@ const CreateCollectionPage: React.FC = () => {
     try {
       const themes = await http.get("/themes");
       setThemes(themes.data.themes);
-      // console.log(themes.data.themes);
     } catch (e) {
       console.log(e);
     }
