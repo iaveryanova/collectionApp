@@ -47,6 +47,7 @@ const CustomFieldsCollection = require("./models/CustomFieldsCollection")(
 const ItemCollections = require("./models/ItemCollections")(sequelize);
 const Comment = require("./models/Comment")(sequelize);
 const Like = require("./models/Like")(sequelize);
+const Tag = require("./models/Tag")(sequelize);
 
 //User-Collection
 User.hasMany(Collection);
@@ -75,6 +76,9 @@ User.hasMany(Like);
 Like.belongsTo(User);
 ItemCollections.hasMany(Like);
 Like.belongsTo(ItemCollections);
+
+ItemCollections.belongsToMany(Tag, { through: 'item_tags' });
+Tag.belongsToMany(ItemCollections, { through: 'item_tags' });
 
 // sequelize.sync({ alter: true, force: false });
 
@@ -401,7 +405,8 @@ app.get("/api/collection/:id", async (req, res) => {
     include: [
       {
         model: ItemCollections,
-        where: { is_deleted: false }
+        where: { is_deleted: false },
+        required: false
       },
       CustomFieldsCollection,
       User
@@ -417,7 +422,7 @@ app.get("/api/collection/:id", async (req, res) => {
       res.sendStatus(403);
     }
   } else {
-    res.sendStatus(404);
+    res.status(200).json({ collection: [] });
   }
 });
 

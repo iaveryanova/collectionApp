@@ -80,12 +80,12 @@ const CollectionPage:React.FC = () => {
     try {
       if (id) {
         let collection = await http.get("/collection/" + id );
-      if(collection.data.collection){
-        const obj_collection = collection.data.collection;
+        if(collection.data.collection){
+          const obj_collection = collection.data.collection;
 
-        setItems(obj_collection.ItemCollections)
-        setName(obj_collection.name)
-      }
+          setItems(obj_collection.ItemCollections)
+          setName(obj_collection.name)
+        }
       }
     } catch (err: any) {
       console.log(err);
