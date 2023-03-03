@@ -40,10 +40,10 @@ export const App: React.FC = () => {
   const initToken = Cookies.get('token');
   const [token, setToken] = useState(initToken ? initToken : '');
   const isAdmin = localStorage.getItem('is_admin') ? true : false;
+  const locale = localStorage.getItem(localStorageKeys.LOCALE) ? localStorage.getItem(localStorageKeys.LOCALE) :  locales.EN;
   const [is_admin, setIsAdmin] = useState(isAdmin);
-  const [currentLocale, setCurrentLocale] = useState(
-    localStorage.getItem(localStorageKeys.LOCALE || locales.EN)
-  )
+  const [currentLocale, setCurrentLocale] = useState(locale)
+  
 
   let initColorMode = localStorage.getItem('colorMode') ?? 'light';
 

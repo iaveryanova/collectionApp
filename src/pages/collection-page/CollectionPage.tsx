@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import http from '../../http';
 import {UserContext} from "../../App";
 import {fieldIntegerValidation, fieldStringValidation} from "../create-item-page/validation";
+import { FormattedMessage } from 'react-intl';
 
 const CollectionPage:React.FC = () => {
 
@@ -134,7 +135,7 @@ const CollectionPage:React.FC = () => {
   return (
 <>
     <Typography variant="h4" gutterBottom>
-        Collection name: {collection.name}
+    <FormattedMessage id="app.collection-page.header" />: {collection.name}
       </Typography>
 
     <div style={{ height: 400, width: '100%' }}>

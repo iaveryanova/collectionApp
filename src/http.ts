@@ -1,6 +1,6 @@
 import axios from "axios";
 
 export default axios.create({
-    baseURL: 'http://localhost:3020/api/',
+    baseURL: 'http://io-dev.avehub.ml/api/',
     withCredentials: true
 })

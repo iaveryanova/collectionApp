@@ -17,5 +17,6 @@
     "app.personal-page.table.header5": "Действия",
     "app.personal-page.table.button-edit": "Редактировать",
     "app.personal-page.table.button-delete": "Удалить",
-    "app.personal-page.table.button-add": "Добавить коллекцию"
+    "app.personal-page.table.button-add": "Добавить коллекцию",
+    "app.collection-page.header": "Имя коллекции"
 }

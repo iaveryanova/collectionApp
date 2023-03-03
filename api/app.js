@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 const { uploadFile } = require("./uploader");
-const port = 3020;
+const port = 3022;
 const app = express();
 
 app.use(

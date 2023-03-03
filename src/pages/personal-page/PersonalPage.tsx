@@ -78,7 +78,7 @@ const PersonalPage: React.FC = () => {
     {
       field:"count",
       headerName: "Count of items",
-      width: 50,
+      width: 100,
       renderCell: (params) => {
         return <div>{params.row.ItemCollections.length}</div>;
       },
@@ -86,7 +86,7 @@ const PersonalPage: React.FC = () => {
     {
       field: "actions",
       headerName: "Actions",
-      width: 100,
+      width: 170,
       sortable: false,
       renderCell: (params) => {
         return (
@@ -96,7 +96,7 @@ const PersonalPage: React.FC = () => {
               style={{ textDecoration: "none" }}
             >
               <Button variant="outlined">
-                Edit
+              <FormattedMessage id="app.personal-page.table.button-edit" />
               </Button>
             </NavLink>
 

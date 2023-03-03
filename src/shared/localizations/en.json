@@ -17,5 +17,6 @@
     "app.personal-page.table.header5": "Actions",
     "app.personal-page.table.button-edit": "Edit",
     "app.personal-page.table.button-delete": "Delete",
-    "app.personal-page.table.button-add": "Add collections"
+    "app.personal-page.table.button-add": "Add collections",
+    "app.collection-page.header": "Collection name"
 }
