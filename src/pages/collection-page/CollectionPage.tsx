@@ -1,55 +1,60 @@
-import React, { useState } from 'react'
+import React, {useContext, useState} from 'react'
 import { DataGrid, GridColDef, GridSelectionModel, GridValueGetterParams } from '@mui/x-data-grid';
-import { Button, Stack, Typography } from '@mui/material';
+import {Button, Checkbox, Stack, Typography} from '@mui/material';
 import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useEffect } from 'react';
 import http from '../../http';
-
-const columns: GridColDef[] = [
-  { field: 'id', headerName: 'ID', width: 70 },
-  { field: 'name', headerName: 'Item name', width: 300, renderCell: (params) => {
-    return (
-      <div>
-        <NavLink
-          to={"/item/" + params.row.id}
-          style={{ textDecoration: "none" }}
-        >
-          {params.value}
-        </NavLink>
-      </div>
-    );
-  }, 
-},
-{ field: 'createdAt', headerName: 'Date of creation', width: 180, renderCell: (params) => (new Date(params.row.createdAt).toLocaleString()) },
-  {
-    field: "actions",
-    headerName: "Actions",
-    width: 100,
-    sortable: false,
-    renderCell: (params) => {
-      return (
-        <div>
-          <NavLink
-            to={"/item/" + params.row.id + "/edit"}
-            style={{ textDecoration: "none" }}
-          >
-            <Button variant="outlined">
-              Edit
-            </Button>
-          </NavLink>
-
-        </div>
-      );
-    },
-  },
-];
-
+import {UserContext} from "../../App";
+import {fieldIntegerValidation, fieldStringValidation} from "../create-item-page/validation";
 
 const CollectionPage:React.FC = () => {
 
+  const columns: GridColDef[] = [
+    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'name', headerName: 'Item name', width: 300, renderCell: (params) => {
+        return (
+          <div>
+            <NavLink
+              to={"/item/" + params.row.id}
+              style={{ textDecoration: "none" }}
+            >
+              {params.value}
+            </NavLink>
+          </div>
+        );
+      },}
+  ];
+  const lastColumns: GridColDef[] = [
+    { field: 'createdAt', headerName: 'Date of creation', width: 180, renderCell: (params) => (new Date(params.row.createdAt).toLocaleString()) },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 100,
+      sortable: false,
+      renderCell: (params) => {
+        return (
+          <div>
+            {context?.token &&
+                <NavLink
+                    to={"/item/" + params.row.id + "/edit"}
+                    style={{textDecoration: "none"}}
+                >
+                    <Button variant="outlined">
+                        Edit
+                    </Button>
+                </NavLink>
+            }
+          </div>
+        );
+      }
+    }
+  ];
+
+
+  const context = useContext(UserContext);
   let navigate = useNavigate();
   const createItem = () => {
     navigate("/collection/" +  colId + "/createitem");
@@ -72,7 +77,8 @@ const CollectionPage:React.FC = () => {
 
 
   const [items, setItems] = useState<any>([]);
-  const [name, setName] = useState<any>([]);
+  const [collection, setCollection] = useState<any>([]);
+  const [cols, setCols] = useState(columns);
 
   const rows = items;
 
@@ -84,7 +90,27 @@ const CollectionPage:React.FC = () => {
           const obj_collection = collection.data.collection;
 
           setItems(obj_collection.ItemCollections)
-          setName(obj_collection.name)
+          setCollection(obj_collection);
+
+          let addColumns:GridColDef[] = [];
+          if(obj_collection.CustomFieldsCollections.length > 0){
+            addColumns = obj_collection.CustomFieldsCollections.map((field:any)=>{
+              return {
+                field: field.custom_field,
+                headerName: field.name,
+                renderCell: (params:any) => {
+
+                  return (<div>{field.custom_field.includes('field_date') ? new Date(params.row[field.custom_field]).toLocaleString() :
+                    field.custom_field.includes('field_bool') ? <Checkbox disabled checked = {params.row[field.custom_field]} /> : params.row[field.custom_field]}</div>)},
+                width: 150
+              }
+            });
+          }
+
+          let bufArray = cols.concat(addColumns);
+          setCols(bufArray.concat(lastColumns));
+
+
         }
       }
     } catch (err: any) {
@@ -108,13 +134,13 @@ const CollectionPage:React.FC = () => {
   return (
 <>
     <Typography variant="h4" gutterBottom>
-        Collection name: {name}
+        Collection name: {collection.name}
       </Typography>
 
     <div style={{ height: 400, width: '100%' }}>
     <DataGrid
       rows={rows}
-      columns={columns}
+      columns={cols}
       pageSize={10}
       rowsPerPageOptions={[10]}
       checkboxSelection
@@ -129,7 +155,7 @@ const CollectionPage:React.FC = () => {
           variant="outlined"
           startIcon={<DeleteIcon />}
           onClick={deleteAction}
-          disabled={!selectedRows || selectedRows.length == 0}
+          disabled={!context?.token || (!selectedRows || selectedRows.length == 0)}
         >
           Delete
         </Button>
@@ -138,6 +164,7 @@ const CollectionPage:React.FC = () => {
           variant="outlined"
           startIcon={<AddIcon />}
           onClick={createItem}
+          disabled={!context?.token}
         >
           Add Item
         </Button>

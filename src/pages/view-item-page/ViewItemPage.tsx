@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useContext, useEffect, useState} from "react";
 import { useParams } from "react-router-dom";
 import http from "../../http";
 import Table from "@mui/material/Table";
@@ -18,8 +18,11 @@ import { Button, Checkbox, TextField, Typography } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import {UserContext} from "../../App";
 
 const ViewItemPage: React.FC = () => {
+
+  const context = useContext(UserContext);
 
   const [comments, setComments] = useState<any>([]);
   const [likes, setLikes] = useState<any>([]);
@@ -33,10 +36,12 @@ const ViewItemPage: React.FC = () => {
     if (id) {
       getDataByItemID(id);
 
-      const interval = setInterval(() => {
-        getIncomingComments(id);
-      }, 5000);
-      return () => clearInterval(interval);
+      if(context?.token){
+        const interval = setInterval(() => {
+          getIncomingComments(id);
+        }, 5000);
+        return () => clearInterval(interval);
+      }
     }
   }, []);
 
@@ -72,9 +77,17 @@ const ViewItemPage: React.FC = () => {
         const item = result.data.item;
 
         setItem(item);
-        setComments(item.Comments);
-        setLikes(item.Likes);
-        setIsLiked(result.data.isLiked);
+        if(context?.token){
+          setComments(item.Comments);
+          setLikes(item.Likes);
+          setIsLiked(result.data.isLiked);
+        }
+
+        let stringForTags = [];
+        if(item.Tags.length > 0){
+          stringForTags = item.Tags.map((tag:any) => tag.name);
+          stringForTags = stringForTags.join(',');
+        }
 
         let fields_info = [
           {property: "Name", value: item.name, field: 'name'},
@@ -82,6 +95,7 @@ const ViewItemPage: React.FC = () => {
           {property: "Collection", value: item.Collection.name, field: 'collection'},
           {property: "Author", value: item.Collection.User.firstName + ' ' + item.Collection.User.lastName + ' (' + item.Collection.User.login + ')', field: 'user'},
           {property: "Date of creation", value: new Date(item.createdAt).toLocaleString(), field: 'createdAt'},
+          {property: "Tags", value: stringForTags, field: 'tags'}
         ];
 
         item.Collection.CustomFieldsCollections.map((field:any) => {
@@ -89,7 +103,9 @@ const ViewItemPage: React.FC = () => {
         });
 
         setFields(fields_info);
-        setValue("id", id);
+        if(context?.token){
+          setValue("id", id);
+        }
 
       }
     } catch (err: any) {
@@ -153,20 +169,22 @@ const ViewItemPage: React.FC = () => {
         </Table>
       </TableContainer>
 
-      <Button
-        endIcon={ isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon /> }
-        type="submit"
-        variant="contained"
-        fullWidth={true}
-        disableElevation={true}
-        onClick={doLike}
-        sx={{
-          width: 100,
-          marginTop: "20px",
-        }}
-      >
-        {likes.length}
-      </Button>
+      {context?.token &&
+          <>
+        <Button
+          endIcon={ isLiked ? <FavoriteIcon /> : <FavoriteBorderIcon /> }
+          type="submit"
+          variant="contained"
+          fullWidth={true}
+          disableElevation={true}
+          onClick={doLike}
+          sx={{
+            width: 100,
+            marginTop: "20px",
+          }}
+        >
+          {likes.length}
+        </Button>
 
       <Typography variant="h5" gutterBottom sx={{
         marginTop: "20px",
@@ -241,6 +259,8 @@ const ViewItemPage: React.FC = () => {
           Send
         </Button>
       </form>
+      </>
+      }
 
     </div>
   );

@@ -12,6 +12,8 @@ type PropTypes = {
   id: string;
   date: string;
   name: string;
+  author: string;
+  countItem: number;
 };
 
 const CollectionCard: React.FC<PropTypes> = (props) => {
@@ -36,9 +38,9 @@ const CollectionCard: React.FC<PropTypes> = (props) => {
           {props.name}
         </Typography>
         <Typography sx={{ mb: 1.5 }} color="text.secondary">
-          user
+        {props.author}
         </Typography>
-        <Typography variant="body2">number of items</Typography>
+        <Typography variant="body2">Count item: {props.countItem}</Typography>
       </CardContent>
       <CardActions>
         <NavLink

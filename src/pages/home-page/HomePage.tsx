@@ -5,34 +5,46 @@ import http from "../../http";
 import { useEffect, useState } from "react";
 import CollectionCard from "../../components/CollectionCard";
 import { FormattedMessage } from "react-intl";
+//@ts-ignore
+import { TagCloud } from 'react-tagcloud';
 
 const HomePage: React.FC = () => {
   const [items, setItems] = useState<any>([]);
   const [collections, setCollections] = useState<any>([]);
+  const [tags, setTags] = useState<any>([]);
 
   const getRecentlyAddedItems = async () => {
     let items = await http.get("/items/");
 
     if (items.data) {
-      console.log(items.data);
       setItems(items.data);
     }
   };
 
   const getBiggestCollections= async () => {
-    let collections = await http.get("/collections/");
+    let collections = await http.get("/top-collections/");
 
     if (collections.data) {
-      console.log(collections.data.collections);
-      setCollections(collections.data.collections);
+      setCollections(collections.data);
     }
   };
+  const getTags = async() => {
+    try {
+      let tags = await http.get("tags");
+      if(tags.data){
+        setTags(tags.data);
+      }
+    } catch (err: any) {
+      console.log(err);
+    }
+  }
 
 
 
   useEffect(() => {
     getRecentlyAddedItems();
     getBiggestCollections();
+    getTags();
   }, []);
 
   return (
@@ -83,11 +95,22 @@ const HomePage: React.FC = () => {
                 key={option.id}
                 date={option.createdAt}
                 name={option.name}
-                id={option.id}
-              />
+                id={option.id} 
+                author={option.User.firstName} 
+                countItem={option.ItemCollections.length}              />
             );
           })}
       </div>
+
+      <Typography variant="h5" gutterBottom mt={3}>
+      <FormattedMessage id="app.home-page.header3" />
+      </Typography>
+      <TagCloud
+        minSize={12}
+        maxSize={55}
+        tags={tags}
+        onClick={(tag:any) => alert(`'${tag.value}' was selected!`)}
+      />
     </>
   );
 };

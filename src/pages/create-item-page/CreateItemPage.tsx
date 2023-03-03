@@ -1,11 +1,13 @@
 import {
+  Autocomplete,
+  Box,
   Button,
-  Checkbox,
+  Checkbox, Chip,
   FormControlLabel,
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
   Controller,
   SubmitHandler,
@@ -48,6 +50,12 @@ interface ICreateItemForm {
   field_bool_1: boolean;
   field_bool_2: boolean;
   field_bool_3: boolean;
+  tags: any;
+}
+interface ITag {
+  id: number;
+  value: string;
+  count: number;
 }
 
 const CreateItemPage: React.FC = () => {
@@ -55,10 +63,11 @@ const CreateItemPage: React.FC = () => {
   const { id , itemId} = useParams();
   const [customFields, setCustomFields] = useState<any>([]);
   const [collection, setCollection] = useState<any>([]);
+  const [tags, setTags] = useState<ITag[]>([]);
 
   const getCustomFieldsByCollectionId = async (id: string) => {
     try {
-      let collection = await http.get("/collection/" + id);
+      let collection = await http.get("collection/" + id);
 
       const obj_collection = collection.data.collection;
       setCustomFields(obj_collection.CustomFieldsCollections);
@@ -69,12 +78,24 @@ const CreateItemPage: React.FC = () => {
     }
   };
 
+  const getTags = async() => {
+    try {
+      let tags = await http.get("tags");
+      if(tags.data){
+        setTags(tags.data);
+      }
+    } catch (err: any) {
+      console.log(err);
+    }
+  }
+
   useEffect(() => {
     if (id) {
       getCustomFieldsByCollectionId(id);
     } else if (itemId) {
       getDataByItemID(itemId);
     }
+    getTags();
 
   }, []);
 
@@ -87,8 +108,10 @@ const CreateItemPage: React.FC = () => {
 
   const onFormSubmit: SubmitHandler<any> = async (data) => {
     try {
+      // console.log(tagsString.split(' '));
+
+      data.tags = selectedTags;
       let res = await http.post("/item/create", data);
-    
       onCollectionPage();
     } catch (err: any) {
       console.log(err);
@@ -96,6 +119,27 @@ const CreateItemPage: React.FC = () => {
   };
 
   const [date, setDate] = React.useState<Dayjs | null>(null);
+  const [selectedTags, setSelectedTags] = useState([]);
+
+  const handleKeyDown = (event:any) => {
+    switch (event.key) {
+      case ",":
+      case " ": {
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.target.value.length > 0) {
+          console.log('key',selectedTags, event.target.value);
+          // @ts-ignore
+          if(!selectedTags.includes(event.target.value)){
+            // @ts-ignore
+            setSelectedTags([...selectedTags, event.target.value])
+          }
+        }
+        break;
+      }
+      default:
+    }
+  };
 
   const navigate = useNavigate();
   const onCollectionPage = () => {
@@ -115,6 +159,7 @@ const CreateItemPage: React.FC = () => {
           const item = result.data.item;
           setCustomFields(item.Collection.CustomFieldsCollections);
           setCollection(item.Collection);
+          setSelectedTags(result.data.item.Tags);
 
           for (let key in item){
             // @ts-ignore
@@ -204,6 +249,31 @@ const CreateItemPage: React.FC = () => {
             />
           )}
         />
+
+<Autocomplete
+          multiple
+          id="tags"
+          options={tags}
+          //@ts-ignore
+          onChange={(event, newTag) => setSelectedTags(newTag)}
+          value={selectedTags}
+          filterSelectedOptions
+          getOptionLabel={(option) => option.value || option.toString()}
+          renderInput={(params) => {
+            params.inputProps.onKeyDown = handleKeyDown;
+            return (
+            <TextField
+              {...params}
+              size="small"
+              margin="normal"
+              sx={{ minWidth: 500 }}
+              fullWidth={true}
+              label="Tags"
+              placeholder="Select or type new tag"
+            />)
+          }}
+        />
+
 
         {customFields.map((option: any) => {
           return (

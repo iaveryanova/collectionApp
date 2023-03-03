@@ -8,6 +8,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import http from "../../http";
 import Cookies from "js-cookie";
+import { FormattedMessage } from "react-intl";
 
 interface ICollection {
   id: number;
@@ -54,7 +55,8 @@ const PersonalPage: React.FC = () => {
       headerName: "Theme",
       width: 90,
       renderCell: (params) => {
-        return <div>{params.value.name}</div>;
+        console.log(params);
+        return <div>{params.row.name}</div>;
       },
     },
     {
@@ -71,6 +73,14 @@ const PersonalPage: React.FC = () => {
             />
           </div>
         );
+      },
+    },
+    {
+      field:"count",
+      headerName: "Count of items",
+      width: 50,
+      renderCell: (params) => {
+        return <div>{params.row.ItemCollections.length}</div>;
       },
     },
     {
@@ -145,7 +155,7 @@ const PersonalPage: React.FC = () => {
   return (
     <>
       <Typography variant="h4" gutterBottom>
-        { author ? <div>{author.firstName + ' ' + author.firstName} collections</div> : <div>My collections</div> }
+        { author ? <div>{author.firstName + ' ' + author.firstName} <FormattedMessage id="app.personal-page.sub-header" /></div> : <div><FormattedMessage id="app.personal-page.header" /></div> }
       </Typography>
 
       <div
@@ -170,7 +180,7 @@ const PersonalPage: React.FC = () => {
           onClick={deleteAction}
           disabled={!selectedRows || selectedRows.length == 0}
         >
-          Delete
+          <FormattedMessage id="app.personal-page.table.button-delete" />
         </Button>
 
         <Button
@@ -178,7 +188,7 @@ const PersonalPage: React.FC = () => {
           startIcon={<AddIcon />}
           onClick={createCollection}
         >
-          Add Collections
+          <FormattedMessage id="app.personal-page.table.button-add" />
         </Button>
       </Stack>
     </>

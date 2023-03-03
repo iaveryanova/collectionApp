@@ -8,32 +8,30 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import locales from '../shared/constants/locales';
 import GlobalContext from '../shared/contexts/GlobalContext';
 import { useContext } from 'react';
+import { Button } from '@mui/material';
 
 
 
 
 const SwitchLocale: React.FC = () => {
-//@ts-ignore
- const {currentLocale, setCurrentLocale} = useContext(GlobalContext);
-    
-  return (
-    
-    <FormControl sx={{width:"70px", height:"50px"}}>
-      <InputLabel id="demo-simple-select-label">Locale</InputLabel>
-      <Select
-        labelId="demo-simple-select-label"
-        id="demo-simple-select"
-        value={currentLocale}
-        label="Locale"
-        onChange={(e) => setCurrentLocale(e.target.value)}
-      >
-        <MenuItem value={locales.EN}>EN</MenuItem>
-        <MenuItem value={locales.RU}>RU</MenuItem>
-    
-      </Select>
-    </FormControl>
-  )
-}
+  //@ts-ignore
+   const {currentLocale, setCurrentLocale} = useContext(GlobalContext);
+      
+    return (
+      
+        <Button variant="outlined" color="inherit" onClick={(e) => {
+            if(currentLocale == locales.EN){
+              setCurrentLocale(locales.RU);
+            }
+            else{
+              setCurrentLocale(locales.EN);
+            }
+          }
+        }>
+          {currentLocale == locales.RU ? locales.RU : locales.EN}
+        </Button>
+    )
+  }
 
 export default SwitchLocale
 

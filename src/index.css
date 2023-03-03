@@ -20,6 +20,10 @@ code {
     monospace;
 }
 
+.tag-cloud-tag, .homelink{
+  cursor: pointer;
+}
+
 .MuiDataGrid-root .MuiDataGrid-cell:focus{
   outline: none!important;
 }

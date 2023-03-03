@@ -26,7 +26,6 @@ const AppRoutes: React.FC = () => {
         <Route path="/collection/:id/createitem" element={<CreateItemPage />} />
         <Route path="/manageuser" element={<ManageUserPage />} />
         <Route path="/personal" element={<PersonalPage />} />
-        <Route path="/viewcollection" element={<ViewCollectionPage />} />
         <Route path="/viewitem" element={<ViewItemPage />} />
         <Route path="/item/:id" element={<ViewItemPage />} />
         <Route path="/item/:itemId/edit" element={<CreateItemPage />} />
@@ -47,8 +46,8 @@ const AppRoutes: React.FC = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/auth" element={<AuthForm />} />
-        <Route path="/viewcollection" element={<ViewCollectionPage />} />
-        <Route path="/viewitem" element={<ViewItemPage />} />
+        <Route path="/collection/:colId" element={<CollectionPage />} />
+        <Route path="/item/:id" element={<ViewItemPage />} />
 
         <Route path="*" element={<Navigate to="/" replace/>} />
     </Routes>

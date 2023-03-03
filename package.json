@@ -33,6 +33,7 @@
     "react-hook-form": "^7.43.1",
     "react-intl": "^6.2.10",
     "react-localization": "^1.0.19",
+    "react-tagcloud": "^2.3.1",
     "react-router-dom": "^6.8.1",
     "react-scripts": "5.0.1",
     "sequelize": "^6.28.0",

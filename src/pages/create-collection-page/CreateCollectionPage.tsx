@@ -110,10 +110,10 @@ const CreateCollectionPage: React.FC = () => {
 
   const navigate = useNavigate();
   const onCollectionList = () => {
-    navigate("/personal");
-    if (userId) {
+    if(userId){
       navigate("/user/" + userId);
-    } else {
+    }
+    else{
       navigate("/personal");
     }
   };
@@ -161,7 +161,11 @@ const CreateCollectionPage: React.FC = () => {
           control={control}
           name="id"
           render={({ field }) => (
-            <input hidden readOnly value={field.value || ""} />
+            <input
+              hidden
+              readOnly
+              value={field.value || ''}
+            />
           )}
         />
 
@@ -169,9 +173,14 @@ const CreateCollectionPage: React.FC = () => {
           control={control}
           name="author_id"
           render={({ field }) => (
-            <input hidden readOnly value={field.value || ""} />
+            <input
+              hidden
+              readOnly
+              value={field.value || ''}
+            />
           )}
         />
+
 
         <div
           style={{

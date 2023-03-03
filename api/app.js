@@ -11,7 +11,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: true, //"http://localhost:3000",
+    origin: config.domain,
     credentials: true,
   })
 );
@@ -86,7 +86,7 @@ Tag.belongsToMany(ItemCollections, { through: 'item_tags' });
 // const theme2 = ThemeCollection.create({ name: "Coins" });
 // const theme3 = ThemeCollection.create({ name: "Pictures" });
 
-const getUserByToken = async (token, res) => {
+const getUserByToken = async (token, res, exit = true) => {
   if (token) {
     const user = await User.findOne({
       where: {
@@ -96,6 +96,9 @@ const getUserByToken = async (token, res) => {
     });
 
     if (!user) {
+      if(!exit){
+        return null;
+      }
       res.clearCookie("token");
       res.status(403).json({ message: "not found user" });
     } else {
@@ -105,6 +108,9 @@ const getUserByToken = async (token, res) => {
     }
   } else {
     res.clearCookie("token");
+    if(!exit){
+      return null;
+    }
     res.status(403).json({ message: "not found token" });
   }
 };
@@ -161,7 +167,9 @@ console.log(req.body);
   let item = null;
   try {
     if (req.body.id) {
-      item = await ItemCollections.findByPk(req.body.id);
+      item = await ItemCollections.findByPk(req.body.id, {
+        include: Tag
+      });
 
       if (!item) {
         res.sendStatus(404);
@@ -186,7 +194,6 @@ console.log(req.body);
       await item.save();
     }
     else {
-      console.log('tut')
         item = await ItemCollections.create({
         name: req.body.name,
         desc: req.body.desc,
@@ -209,6 +216,21 @@ console.log(req.body);
         UserId: user.id
       });
       }
+
+      let newTags = [];
+      if(req.body.tags.length > 0){
+        newTags = await Promise.all(req.body.tags.map( async (tag) => {
+          if(tag.id){
+            return tag.id;
+          }
+          else{
+            let newTag = await Tag.create({name:tag});
+            return newTag.id;
+          }
+        }));
+      }
+  
+      item.setTags(newTags);
     
     res.status(200).json({ message: "Item saved successfully" , item:item});
   } catch (e) {
@@ -332,7 +354,7 @@ app.get("/api/collections", async (req, res) => {
   }
   //for admin - remove UserId where condition
   const collections = await Collection.findAll({
-    include: ThemeCollection,
+    include: [ThemeCollection, ItemCollections],
     where: { is_deleted: false, UserId: user.id },
   });
   res.status(200).json({ collections: collections ?? [] });
@@ -350,7 +372,7 @@ app.get("/api/user/:id/collections", async (req, res) => {
   }
   //for admin - remove UserId where condition
   const collections = await Collection.findAll({
-    include: [ThemeCollection, User],
+    include: [ThemeCollection, User, ItemCollections],
     where: { is_deleted: false, UserId: req.params.id },
   });
   // console.log(collections);
@@ -397,57 +419,98 @@ app.get('/api/user/:id/:action', async (req, res) => {
 
 app.get("/api/collection/:id", async (req, res) => {
   let token = req.cookies["token"];
-  const user = await getUserByToken(token, res);
+  const user = await getUserByToken(token, res, false);
+  let collection = null;
   if(!user){
-    return;
+
+    collection = await Collection.findByPk(req.params.id, {
+      include: [
+        {
+          model: ItemCollections,
+          where: { is_deleted: false },
+          required: false
+        },
+        CustomFieldsCollection,
+        {model: User, attributes:['firstName', 'lastName', 'login']}
+      ],
+      where: { is_deleted: false },
+      // order: [ [ItemCollections, 'createdAt', 'ASC']],
+    });
+
+    res.status(200).json({ collection: collection });
   }
-  const collection = await Collection.findByPk(req.params.id, {
-    include: [
-      {
-        model: ItemCollections,
-        where: { is_deleted: false },
-        required: false
-      },
-      CustomFieldsCollection,
-      User
-    ],
-    where: { is_deleted: false },
-    // order: [ [ItemCollections, 'createdAt', 'ASC']],
-  });
-  if (collection) {
-    if(collection.UserId == user.id || user.is_admin){
-      res.status(200).json({ collection: collection });
+  else{
+    collection = await Collection.findByPk(req.params.id, {
+      include: [
+        {
+          model: ItemCollections,
+          where: { is_deleted: false },
+          required: false
+        },
+        CustomFieldsCollection,
+        User,
+        ThemeCollection
+      ],
+      where: { is_deleted: false },
+      // order: [ [ItemCollections, 'createdAt', 'ASC']],
+    });
+
+    if (collection) {
+      const canEdit = Collection.UserId == user.id || user.is_admin;
+      res.status(200).json({ collection: collection, canEdit: canEdit });
+
+    } else {
+      res.status(200).json({ collection: null });
     }
-    else{
-      res.sendStatus(403);
-    }
-  } else {
-    res.status(200).json({ collection: [] });
   }
 });
 
 
 app.get("/api/item/:id", async (req, res) => {
   let token = req.cookies["token"];
-  const user = await getUserByToken(token, res);
+  const user = await getUserByToken(token, res, false);
+  console.log('user after getUserByTOken',user);
+  let item = null;
   if(!user){
-    return;
+    item = await ItemCollections.findByPk(req.params.id, {
+      include: [
+        Tag,
+        {
+          model:Collection,
+          include:[
+            CustomFieldsCollection,
+            { model:User, attributes:['firstName', 'lastName'] }
+          ]
+        }
+      ]
+    });
+
+    if (item) {
+      res.status(200).json({ item: item});
+    } else {
+      res.sendStatus(404);
+    }
   }
-  const item = await ItemCollections.findByPk(req.params.id, {
-    include: { all: true, nested: true },
-    where: { is_deleted: false },
-    order: [ [Comment, 'id', 'desc']],
-  });
-  const isLiked = await Like.findOne({
-    where : {UserId: user.id, ItemCollectionId: item.id}
-  });
-  if (item) {
-    const canEdit = item.Collection.UserId == user.id || user.is_admin;
-    res.status(200).json({ item: item, isLiked: (isLiked ? true : false), canEdit: canEdit});
-  } else {
-    res.sendStatus(404);
+  else{
+    item = await ItemCollections.findByPk(req.params.id, {
+      include: { all: true, nested: true },
+      where: { is_deleted: false },
+      order: [ [Comment, 'id', 'desc']],
+    });
+    const isLiked = await Like.findOne({
+      where : {UserId: user.id, ItemCollectionId: item.id}
+    });
+
+    if (item) {
+      const canEdit = item.Collection.UserId == user.id || user.is_admin;
+      res.status(200).json({ item: item, isLiked: (isLiked ? true : false), canEdit: canEdit});
+    } else {
+      res.sendStatus(404);
+    }
   }
 });
+
+
 
 app.post("/api/item/like", async (req, res) => {
   let token = req.cookies["token"];
@@ -650,15 +713,46 @@ app.get('/api/items', async (req, res) => {
   res.status(200).json(items ?? [] );
 })
 
-app.get('/api/collections', async (req, res) => {
+app.get('/api/top-collections', async (req, res) => {
 
   const collections = await Collection.findAll({
     where: { is_deleted: false },
     include: { all: true, nested: true },
-    limit: 3
+    limit: 3,
+    attributes: {
+      include: [
+        [
+          sequelize.literal(`(
+                    SELECT COUNT(*)
+                    FROM items_collections AS i
+                    WHERE
+                        i.CollectionId = Collection.id
+                        AND
+                        i.is_deleted = 0
+                )`),
+          'itemsCount'
+        ]
+      ]
+    },
+    order: [
+      [sequelize.literal('itemsCount'), 'DESC']
+    ]
   });
+
   res.status(200).json(collections ?? [] );
 })
+
+app.get('/api/tags', async (req, res) => {
+  const tags = await Tag.findAll({include: ItemCollections});
+  const outputTags = tags.map((tag) => {
+    return {
+      id: tag.id,
+      value: tag.name,
+      count: tag.ItemCollections.length
+    };
+  })
+  res.status(200).json(outputTags ?? [] );
+});
 
 
 app.listen(port, () => {

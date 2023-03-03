@@ -20,6 +20,7 @@ import http from "../http";
 import { ColorContext } from "../ColorContext";
 import SwitchModeButton from "./SwitchModeButton";
 import SwitchLocale from "./SwitchLocale";
+import { FormattedMessage } from "react-intl";
 
 
 interface Props {
@@ -97,26 +98,26 @@ const NavBar: React.FC = (props: Props) => {
             component="div"
             sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
           >
-            HOME PAGE
+            <FormattedMessage id="app.navbar.homepage" />
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
             {context?.token ? (
               <>
                 {context?.is_admin && (
                   <Button color="inherit" onClick={() => navigate("admin")}>
-                    Users
+                    <FormattedMessage id="app.navbar.users" />
                   </Button>
                 )}
                 <Button color="inherit" onClick={() => navigate("personal")}>
-                  My collections
+                <FormattedMessage id="app.navbar.my-collections" />
                 </Button>
                 <Button color="inherit" onClick={logout}>
-                  Logout
+                <FormattedMessage id="app.navbar.logout" />
                 </Button>
               </>
             ) : (
               <Button color="inherit" onClick={() => navigate("auth")}>
-                Login
+                <FormattedMessage id="app.navbar.login" />
               </Button>
             )}
 
