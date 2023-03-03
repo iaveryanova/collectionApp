@@ -86,6 +86,16 @@ Tag.belongsToMany(ItemCollections, { through: 'item_tags' });
 // const theme2 = ThemeCollection.create({ name: "Coins" });
 // const theme3 = ThemeCollection.create({ name: "Pictures" });
 
+// const user = User.create({
+//   firstName: 'Admin',
+//   lastName: 'Admin',
+//   login: 'admin',
+//   password: crypto.createHash("md5").update('admin').digest("hex"),
+//   email: "admin@admin.com",
+//   status: 1,
+//   is_admin: true
+// });
+
 const getUserByToken = async (token, res, exit = true) => {
   if (token) {
     const user = await User.findOne({
