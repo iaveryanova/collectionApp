@@ -15,6 +15,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import http from "../../http";
+import { FormattedMessage } from "react-intl";
 
 interface ICreateCollectionForm {
   id: number;
@@ -150,11 +151,11 @@ const CreateCollectionPage: React.FC = () => {
         className="create-collection-form"
         onSubmit={handleSubmit(onFormSubmit)}
         style={{
-          width: "500px",
+          width: "600px",
         }}
       >
         <Typography variant="h4" gutterBottom>
-          Create Collection
+        <FormattedMessage id="app.create-collection-page.header1" />
         </Typography>
 
         <Controller
@@ -206,7 +207,7 @@ const CreateCollectionPage: React.FC = () => {
           </Box>
           <Stack direction="row" alignItems="center" spacing={2}>
             <Button variant="outlined" component="label" size="large">
-              Upload image
+            <FormattedMessage id="app.create-collection-page.button-upload" />
               <Controller
                 control={control}
                 name="image"
@@ -294,7 +295,7 @@ const CreateCollectionPage: React.FC = () => {
         />
 
         <Typography variant="h6" gutterBottom>
-          Additional characteristics
+        <FormattedMessage id="app.create-collection-page.header2" />
         </Typography>
 
         <Typography
@@ -303,7 +304,7 @@ const CreateCollectionPage: React.FC = () => {
           gutterBottom={true}
           sx={{ color: "rgb(180, 184, 193)" }}
         >
-          Enter the name of the required fields
+          <FormattedMessage id="app.create-collection-page.sub-header" />
         </Typography>
 
         <Controller
@@ -565,7 +566,7 @@ const CreateCollectionPage: React.FC = () => {
             disabled={!isValid}
             startIcon={<SaveIcon />}
           >
-            Save
+            <FormattedMessage id="app.create-collection-page.button-save" />
           </Button>
 
           <Button
@@ -574,7 +575,7 @@ const CreateCollectionPage: React.FC = () => {
             startIcon={<RestartAltIcon />}
             disabled={!isValid}
           >
-            Reset
+            <FormattedMessage id="app.create-collection-page.button-reset" />
           </Button>
 
           <Button
@@ -582,7 +583,7 @@ const CreateCollectionPage: React.FC = () => {
             variant="outlined"
             startIcon={<ArrowBackIcon />}
           >
-            Back to collection list
+            <FormattedMessage id="app.create-collection-page.button-back" />
           </Button>
         </div>
       </form>

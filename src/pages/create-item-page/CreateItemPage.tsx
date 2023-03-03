@@ -24,6 +24,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { fieldIntegerValidation, fieldStringValidation } from "./validation";
+import { FormattedMessage } from "react-intl";
 
 interface ICreateItemForm {
   collectionId: string;
@@ -180,18 +181,18 @@ const CreateItemPage: React.FC = () => {
   return (
     <div>
       <Typography variant="h4" gutterBottom>
-        Create Item
+      <FormattedMessage id="app.create-item-page.header1" />
       </Typography>
 
       <Typography variant="h5" gutterBottom>
-        Collection Name: {collection.name}
+      <FormattedMessage id="app.create-item-page.header2" />: {collection.name}
       </Typography>
 
       <form
         className="create-collection-form"
         onSubmit={handleSubmit(onFormSubmit)}
         style={{
-          width: "500px",
+          width: "600px",
         }}
       >
 
@@ -266,7 +267,7 @@ const CreateItemPage: React.FC = () => {
               {...params}
               size="small"
               margin="normal"
-              sx={{ minWidth: 500 }}
+              sx={{ minWidth: 600 }}
               fullWidth={true}
               label="Tags"
               placeholder="Select or type new tag"
@@ -351,7 +352,7 @@ const CreateItemPage: React.FC = () => {
             disabled={!isValid}
             startIcon={<SaveIcon />}
           >
-            Save
+            <FormattedMessage id="app.create-item-page.button-save" />
           </Button>
 
           <Button
@@ -360,7 +361,7 @@ const CreateItemPage: React.FC = () => {
             startIcon={<RestartAltIcon />}
             disabled={!isValid}
           >
-            Reset
+            <FormattedMessage id="app.create-item-page.button-reset" />
           </Button>
 
           <Button
@@ -368,7 +369,7 @@ const CreateItemPage: React.FC = () => {
             variant="outlined"
             startIcon={<ArrowBackIcon />}
           >
-            Back to collection list
+            <FormattedMessage id="app.create-item-page.button-back" />
           </Button>
         </div>
       </form>

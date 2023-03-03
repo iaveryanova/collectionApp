@@ -18,5 +18,27 @@
     "app.personal-page.table.button-edit": "Редактировать",
     "app.personal-page.table.button-delete": "Удалить",
     "app.personal-page.table.button-add": "Добавить коллекцию",
-    "app.collection-page.header": "Имя коллекции"
+    "app.collection-page.header": "Имя коллекции",
+    "app.collection-page.button-edit": "Редактировать",
+    "app.collection-page.button-delete": "Удалить",
+    "app.collection-page.button-add": "Добавить айтем",
+    "app.collection-page.button-back": "Назад к списку коллекций",
+    "app.create-collection-page.header1": "Создать коллекцию",
+    "app.create-collection-page.header2": "Дополнительные характеристики",
+    "app.create-collection-page.sub-header": "Введите название необходимых полей",
+    "app.create-collection-page.button-upload": "Загрузить изображение",
+    "app.create-collection-page.button-save": "Сохранить",
+    "app.create-collection-page.button-reset": "Сбросить",
+    "app.create-collection-page.button-back": "Назад к списку коллекций",
+    "app.create-item-page.header1": "Создать айтем",
+    "app.create-item-page.header2": "Название коллекции",
+    "app.create-item-page.button-save": "Сохранить",
+    "app.create-item-page.button-reset": "Сбросить",
+    "app.create-item-page.button-back": "Назад к списку айтемов",
+    "app.admin-page.header": "Управление пользователями",
+    "app.admin-page.button-up-to-admin": "Установить админом",
+    "app.admin-page.button-delete": "Удалить",
+    "app.admin-page.button-block": "Заблокировать",
+    "app.admin-page.button-unblock": "Разблокировать"
+
 }

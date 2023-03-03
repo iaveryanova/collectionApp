@@ -18,5 +18,27 @@
     "app.personal-page.table.button-edit": "Edit",
     "app.personal-page.table.button-delete": "Delete",
     "app.personal-page.table.button-add": "Add collections",
-    "app.collection-page.header": "Collection name"
+    "app.collection-page.header": "Collection name",
+    "app.collection-page.button-edit": "Edit",
+    "app.collection-page.button-delete": "Delete",
+    "app.collection-page.button-add": "Add items",
+    "app.collection-page.button-back": "Back to collection list",
+    "app.create-collection-page.header1": "Create Collection",
+    "app.create-collection-page.header2": "Additional characteristics",
+    "app.create-collection-page.sub-header": "Enter the name of the required fields",
+    "app.create-collection-page.button-upload": "Upload image",
+    "app.create-collection-page.button-save": "Save",
+    "app.create-collection-page.button-reset": "Reset",
+    "app.create-collection-page.button-back": "Back to collection list",
+    "app.create-item-page.header1": "Create Item",
+    "app.create-item-page.header2": "Collection Name",
+    "app.create-item-page.button-save": "Save",
+    "app.create-item-page.button-reset": "Reset",
+    "app.create-item-page.button-back": "Back to item list",
+    "app.admin-page.header": "User management",
+    "app.admin-page.button-up-to-admin": "Up to admin",
+    "app.admin-page.button-delete": "Delete",
+    "app.admin-page.button-block": "Block",
+    "app.admin-page.button-unblock": "Unblock"
+
 }

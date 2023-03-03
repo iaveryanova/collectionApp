@@ -6,6 +6,7 @@ import {DataGrid, GridColDef, GridSelectionModel} from "@mui/x-data-grid";
 import {NavLink, useNavigate} from "react-router-dom";
 import Cookies from "js-cookie";
 import {UserContext} from "../../App";
+import { FormattedMessage } from 'react-intl';
 
 const AdminPage: React.FC = () => {
 
@@ -73,7 +74,7 @@ const AdminPage: React.FC = () => {
                     navigate('/');
                   }
                 }}>
-                  Up to Admin
+                  <FormattedMessage id="app.admin-page.button-up-to-admin" />
                 </Button>
             }
           </div>
@@ -108,7 +109,7 @@ const AdminPage: React.FC = () => {
                   navigate('/');
                 }
               }}>
-                Delete
+                <FormattedMessage id="app.admin-page.button-delete" />
               </Button>
 
               <Button variant="outlined" onClick={async() => {
@@ -123,7 +124,7 @@ const AdminPage: React.FC = () => {
                   navigate('/');
                 }
               }}>
-                {params.row.status == 1 ? <div>Block</div> : <div>Unblock</div>}
+                {params.row.status == 1 ? <div><FormattedMessage id="app.admin-page.button-block" /></div> : <div><FormattedMessage id="app.admin-page.button-unblock" /></div>}
               </Button>
 
           </div>
@@ -162,7 +163,7 @@ const AdminPage: React.FC = () => {
   return (
     <>
       <Typography variant="h5" gutterBottom>
-        Admin page
+      <FormattedMessage id="app.admin-page.header" />
       </Typography>
 
       <div

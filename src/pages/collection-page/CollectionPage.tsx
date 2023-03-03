@@ -44,7 +44,7 @@ const CollectionPage:React.FC = () => {
                     style={{textDecoration: "none"}}
                 >
                     <Button variant="outlined">
-                        Edit
+                    <FormattedMessage id="app.collection-page.button-edit" />
                     </Button>
                 </NavLink>
             }
@@ -158,7 +158,7 @@ const CollectionPage:React.FC = () => {
           onClick={deleteAction}
           disabled={!context?.token || (!selectedRows || selectedRows.length == 0)}
         >
-          Delete
+          <FormattedMessage id="app.collection-page.button-delete" />
         </Button>
 
         <Button
@@ -167,7 +167,7 @@ const CollectionPage:React.FC = () => {
           onClick={createItem}
           disabled={!context?.token}
         >
-          Add Item
+          <FormattedMessage id="app.collection-page.button-add" />
         </Button>
 
         <Button
@@ -175,7 +175,7 @@ const CollectionPage:React.FC = () => {
             variant="outlined"
             startIcon={<ArrowBackIcon />}
           >
-            Back to collection list
+            <FormattedMessage id="app.collection-page.button-back" />
           </Button>
       </Stack>
 </>
