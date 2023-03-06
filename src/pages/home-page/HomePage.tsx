@@ -38,7 +38,7 @@ const HomePage: React.FC = () => {
           return {
             id: tag.id,
             value: tag.name,
-            count: tag.ItemCollections.length
+            count: tag.count
           };
         })
         setTags(outputTags);

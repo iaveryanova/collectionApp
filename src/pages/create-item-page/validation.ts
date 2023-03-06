@@ -10,7 +10,7 @@ export const fieldIntegerValidation = {
 
 export const fieldStringValidation = {
     validate: (value: string) => {
-        if(value.length > 255) {
+        if(value.toString().length > 255) {
             return 'Field must contain less then 256 characters.'
         }
         return true;
