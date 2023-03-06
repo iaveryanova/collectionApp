@@ -46,11 +46,13 @@ const RegisterForm: React.FC = (props) => {
     } else {
       try{
         let res = await http.post('/register', data);
-        alert("Congratulations, you are registered!");
+        alert("Congratulations, you are registered!!!");
         navigate("/auth");
       }
       catch (e){
-        console.log(e);
+        console.log(e)
+         //@ts-ignore
+        alert(e.response.data.error.original.sqlMessage);
       }
     }
   };

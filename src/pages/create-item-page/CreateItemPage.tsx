@@ -55,8 +55,9 @@ interface ICreateItemForm {
 }
 interface ITag {
   id: number;
-  value: string;
+  name: string;
   count: number;
+  value: string;
 }
 
 const CreateItemPage: React.FC = () => {
@@ -65,6 +66,7 @@ const CreateItemPage: React.FC = () => {
   const [customFields, setCustomFields] = useState<any>([]);
   const [collection, setCollection] = useState<any>([]);
   const [tags, setTags] = useState<ITag[]>([]);
+  const [selectedTags, setSelectedTags] = useState([]);
 
   const getCustomFieldsByCollectionId = async (id: string) => {
     try {
@@ -109,7 +111,6 @@ const CreateItemPage: React.FC = () => {
 
   const onFormSubmit: SubmitHandler<any> = async (data) => {
     try {
-      // console.log(tagsString.split(' '));
 
       data.tags = selectedTags;
       let res = await http.post("/item/create", data);
@@ -120,7 +121,6 @@ const CreateItemPage: React.FC = () => {
   };
 
   const [date, setDate] = React.useState<Dayjs | null>(null);
-  const [selectedTags, setSelectedTags] = useState([]);
 
   const handleKeyDown = (event:any) => {
     switch (event.key) {
@@ -259,7 +259,12 @@ const CreateItemPage: React.FC = () => {
           onChange={(event, newTag) => setSelectedTags(newTag)}
           value={selectedTags}
           filterSelectedOptions
-          getOptionLabel={(option) => option.value || option.toString()}
+          getOptionLabel={(option) =>{
+            console.log(option)
+            return(
+              option.name || option.toString()
+            )
+          }}
           renderInput={(params) => {
             params.inputProps.onKeyDown = handleKeyDown;
             return (

@@ -32,7 +32,16 @@ const HomePage: React.FC = () => {
     try {
       let tags = await http.get("tags");
       if(tags.data){
-        setTags(tags.data);
+
+        //@ts-ignore
+        const outputTags = tags.data.map((tag) => {
+          return {
+            id: tag.id,
+            value: tag.name,
+            count: tag.ItemCollections.length
+          };
+        })
+        setTags(outputTags);
       }
     } catch (err: any) {
       console.log(err);
@@ -97,7 +106,8 @@ const HomePage: React.FC = () => {
                 name={option.name}
                 id={option.id} 
                 author={option.User.firstName} 
-                countItem={option.ItemCollections.length}              />
+                countItem={option.itemsCount}
+                />
             );
           })}
       </div>

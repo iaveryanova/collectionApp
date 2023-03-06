@@ -634,16 +634,25 @@ app.post("/api/items/delete", async (req, res) => {
 
 app.post("/api/register", async (req, res) => {
   const { firstName, lastName, email, login, password, token } = req.body;
+  if (firstName == '' || lastName == '' || email == '' || login == '' || password == '') {
+    res.sendStatus(400);
+  }
   let hash_password = crypto.createHash("md5").update(password).digest("hex");
-  const user = await User.create({
-    firstName,
-    lastName,
-    email,
-    login,
-    password: hash_password,
-    token,
-  });
-  res.status(200).json({ message: "Register successfully" });
+  try {
+    const user = await User.create({
+      firstName,
+      lastName,
+      email,
+      login,
+      password: hash_password,
+      token,
+    });
+    res.status(200).json({ message: "Register successfully" });
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({ error: e });
+  }
+  
 });
 
 app.post("/api/login", async (req, res) => {
@@ -715,8 +724,21 @@ app.get('/api/users', async (req, res) => {
 app.get('/api/items', async (req, res) => {
 
   const items = await ItemCollections.findAll({
-    where: { is_deleted: false },
-    include: { all: true, nested: true },
+    where: { 
+      is_deleted: false, 
+      '$Collection.is_deleted$': false,
+      '$Collection.User.status$': 1
+    },
+    include: [
+      {
+        model: Collection, 
+        as: 'Collection',
+        include: {
+          model: User,
+          as: 'User'
+        }
+      }
+    ],
     limit: 3,
     order: [['createdAt', 'DESC']],
   });
@@ -726,8 +748,16 @@ app.get('/api/items', async (req, res) => {
 app.get('/api/top-collections', async (req, res) => {
 
   const collections = await Collection.findAll({
-    where: { is_deleted: false },
-    include: { all: true, nested: true },
+    where: { 
+      is_deleted: false, 
+      '$User.status$': 1
+    },
+    include: [
+      { 
+        model: User,
+        as: 'User'
+      },
+    ],
     limit: 3,
     attributes: {
       include: [
@@ -748,7 +778,6 @@ app.get('/api/top-collections', async (req, res) => {
       [sequelize.literal('itemsCount'), 'DESC']
     ]
   });
-
   res.status(200).json(collections ?? [] );
 })
 
@@ -757,7 +786,7 @@ app.get('/api/tags', async (req, res) => {
   const outputTags = tags.map((tag) => {
     return {
       id: tag.id,
-      value: tag.name,
+      name: tag.name,
       count: tag.ItemCollections.length
     };
   })
